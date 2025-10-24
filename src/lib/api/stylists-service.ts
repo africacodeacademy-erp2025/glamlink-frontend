@@ -124,6 +124,7 @@ export const createServiceAndAddToStylist = async (data: {
   serviceName: string;
   price: number;
   description?: string;
+  category?: string;
 }) => {
   try {
     // First, check if the service already exists
@@ -149,6 +150,7 @@ export const createServiceAndAddToStylist = async (data: {
       const serviceRes = await apiClient.post(`/services`, {
         name: data.serviceName,
         description: data.description || `${data.serviceName} service`,
+        category: data.category,
       });
       serviceIdToUse = serviceRes.data.id;
     }
