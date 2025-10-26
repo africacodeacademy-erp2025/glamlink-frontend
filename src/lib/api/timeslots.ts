@@ -198,7 +198,7 @@ export const fetchSlotTimes = async (
     });
     setSlotTimes(newSlotTimes);
   } catch (error) {
-    // Silently fail or handle error as needed
+    console.error("Failed to fetch slot times", error);
   }
 };
 

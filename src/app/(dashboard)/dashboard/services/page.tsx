@@ -62,7 +62,7 @@ export default function ServicesPage() {
   const [editingService, setEditingService] = useState<any>(null);
   const [editServiceName, setEditServiceName] = useState("");
   const [editPrice, setEditPrice] = useState("");
-  const [editCategory, setEditCategory] = useState<string>("Hair");
+  const [editCategory, setEditCategory] = useState<string>("");
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Category dropdown state and services from backend
@@ -161,14 +161,14 @@ export default function ServicesPage() {
 
       await createServiceAndAddToStylist(serviceData);
 
-      setServiceName("");
+  setServiceName("");
   setPrice("");
-  setCategory("Hair");
+  setCategory("");
   setDescription("");
-  setShowAddModal(false);
-  setMessage('Service added successfully!');
-  await fetchServices();
-  setTimeout(() => setMessage(''), 3000);
+      setShowAddModal(false);
+      setMessage('Service added successfully!');
+      await fetchServices();
+      setTimeout(() => setMessage(''), 3000);
     } catch (error: any) {
       setError("Failed to add service. Please try again.");
     } finally {
@@ -181,7 +181,7 @@ export default function ServicesPage() {
   setEditingService(service);
   setEditServiceName(getServiceName(service));
   setEditPrice(service.price?.toString() || "");
-  setEditCategory(service.category || "Hair");
+  setEditCategory(service.category || "");
   setEditDescription(service.description || "");
   setShowEditModal(true);
   };
@@ -203,14 +203,14 @@ export default function ServicesPage() {
         }
       );
 
-      setMessage('Service updated successfully!');
-      setTimeout(() => setMessage(''), 3000);
-      setShowEditModal(false);
-      setEditingService(null);
-      setEditServiceName("");
-      setEditPrice("");
-      setEditCategory("Hair");
-      fetchServices(); // Refresh the list
+  setMessage('Service updated successfully!');
+  setTimeout(() => setMessage(''), 3000);
+  setShowEditModal(false);
+  setEditingService(null);
+  setEditServiceName("");
+  setEditPrice("");
+  setEditCategory("");
+  fetchServices(); // Refresh the list
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || "Unknown error";
@@ -370,6 +370,9 @@ export default function ServicesPage() {
                     <option value="Nails">Nails</option>
                     <option value="Makeup">Makeup</option>
                     <option value="Hairstyles">Hairstyles</option>
+                    <option value="Massage">Massage</option>
+                    <option value="Other">Other</option>
+                  
                   </select>
                 </div>
               <div>
@@ -445,6 +448,8 @@ export default function ServicesPage() {
                     <SelectItem value="Nails">Nails</SelectItem>
                     <SelectItem value="Makeup">Makeup</SelectItem>
                     <SelectItem value="Hairstyles">Hairstyles</SelectItem>
+                    <SelectItem value="Massage">Massage</SelectItem>
+                    
                   </SelectContent>
                 </Select>
               </div>
@@ -552,6 +557,8 @@ export default function ServicesPage() {
                   <option value="Nails">Nails</option>
                   <option value="Makeup">Makeup</option>
                   <option value="Hairstyles">Hairstyles</option>
+                  <option value="Massage">Massage</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div>
