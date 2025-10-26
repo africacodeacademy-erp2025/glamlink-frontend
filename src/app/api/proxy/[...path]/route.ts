@@ -31,9 +31,11 @@ async function proxyRequest(
   }
 
   // Forward headers from the original request
-  const headers: HeadersInit = {
-    "Content-Type": request.headers.get("Content-Type") || "application/json",
-  };
+  const headers: HeadersInit = {};
+  const contentType = request.headers.get("Content-Type");
+  if (contentType && body) {
+    headers["Content-Type"] = contentType;
+  }
 
   // Forward Authorization header if present
   const authHeader = request.headers.get("Authorization");
