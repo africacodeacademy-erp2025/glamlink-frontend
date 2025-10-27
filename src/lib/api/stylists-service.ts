@@ -98,6 +98,15 @@ export const updateStylistService = async (
   return res.data;
 };
 
+// Update service category
+export const updateServiceCategory = async (
+  serviceId: string,
+  category: string
+) => {
+  const res = await apiClient.put(`/services/${serviceId}`, { category });
+  return res.data;
+};
+
 // Delete service from stylist
 export const removeServiceFromStylist = async (
   stylistId: string,
@@ -124,6 +133,7 @@ export const createServiceAndAddToStylist = async (data: {
   serviceName: string;
   price: number;
   description?: string;
+  category?: string;
 }) => {
   try {
     // First, check if the service already exists
@@ -149,6 +159,7 @@ export const createServiceAndAddToStylist = async (data: {
       const serviceRes = await apiClient.post(`/services`, {
         name: data.serviceName,
         description: data.description || `${data.serviceName} service`,
+        category: data.category,
       });
       serviceIdToUse = serviceRes.data.id;
     }
@@ -181,14 +192,21 @@ export const updateStylistServiceWithName = async (
     serviceName?: string;
     price?: number;
     duration?: number;
+    category?: string;      // add this
+    description?: string;   // add this
   }
 ) => {
   try {
     // If service name needs to be updated, update the service record
     if (data.serviceName && serviceId) {
-      await apiClient.put(`/services/${serviceId}`, {
+      const updatePayload = {
         name: data.serviceName,
-      });
+        category: data.category,
+        description: data.description,
+        price: data.price
+      };
+      console.log('[DEBUG] Updating service:', serviceId, updatePayload);
+      await apiClient.put(`/services/${serviceId}`, updatePayload);
     }
 
     // Update the stylist service record (price, duration)
