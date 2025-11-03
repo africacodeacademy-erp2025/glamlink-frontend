@@ -15,11 +15,20 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [greeting, setGreeting] = useState("Welcome!");
+  const [currentSlide, setCurrentSlide] = useState(0);
 
+  const slides = [
+    "/assets/image.png",
+    "/assets/imae.png",
+    "/assets/i.png",
+  ];
+
+  // Redirect if logged in
   useEffect(() => {
     if (isAuthenticated) router.push("/dashboard");
   }, [isAuthenticated, router]);
 
+  // Greeting message
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning!");
@@ -27,6 +36,15 @@ export default function LoginPage() {
     else setGreeting("Good evening!");
   }, []);
 
+  // Auto slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  // Login logic
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -55,13 +73,31 @@ export default function LoginPage() {
     }
   };
 
+  // Reset error when typing
   useEffect(() => {
     if (error) setError("");
   }, [email, password]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-100 via-pink-200 to-pink-100 p-4">
-      <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 w-full max-w-md flex flex-col items-center transition-transform hover:scale-[1.02] duration-300">
+    <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
+      {/*  Background Slideshow */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            alt={`Slide ${index}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        {/* Subtle overlay for contrast */}
+        <div className="absolute inset-0 bg-pink-300/10"></div>
+      </div>
+
+      {/* 💫 Login Card */}
+      <div className="relative z-10 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md flex flex-col items-center transition-transform hover:scale-[1.02] duration-300 border border-white/30">
         {/* Greeting */}
         <div className="mb-6 p-5 bg-pink-500 rounded-xl shadow text-white w-full text-center">
           <h2 className="text-xl font-bold">{greeting}</h2>

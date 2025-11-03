@@ -34,6 +34,22 @@ function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Background slideshow
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    "/assets/image.png",
+    "/assets/imae.png",
+    "/assets/i.png",
+  ];
+
+  // Auto slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
   // Check URL for pre-selected plan
   useEffect(() => {
     const plan = searchParams.get("plan");
@@ -101,14 +117,31 @@ function SignUpForm() {
   })();
 
   return (
-    <div className="min-h-screen bg-pink-100 p-4 flex flex-col items-center">
-      <div className="max-w-5xl w-full">
+    <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
+      {/* 🌸 Background Slideshow */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            alt={`Slide ${index}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        {/* Soft tint overlay */}
+        <div className="absolute inset-0 bg-pink-300/5"></div>
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 w-full max-w-5xl px-4 py-10">
         {/* Subscription Plans */}
         {!selectedPlan && <SubscriptionPlans />}
 
         {/* Signup Form */}
         {selectedPlan && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mt-10 flex flex-col items-center w-full max-w-md mx-auto">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 mt-10 flex flex-col items-center w-full max-w-md mx-auto transition-transform hover:scale-[1.02] duration-300">
             <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white w-full text-center">
               <h2 className="text-lg font-bold">{greeting}</h2>
               <p className="text-pink-200">Join GlamLink today!</p>

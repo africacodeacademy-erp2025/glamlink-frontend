@@ -1,12 +1,11 @@
-
 "use client";
 import { useState, useEffect } from "react";
-import { 
+import {
   getUserProfileById,
   updateUserProfileById,
   uploadProfilePictureById,
-  UserProfile,
-} from "@/lib/api/profile";
+  UserProfile
+} from "@/app/api/profile";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
@@ -19,62 +18,62 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  
+
   // Form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(""); // user-entered
+  const [country, setCountry] = useState(""); // auto-detected, readonly
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [subscriptionPlan, setSubscriptionPlan] = useState("");
   const countryList = ["Botswana", "Lesotho", "South Africa", "United States"];
   const [country, setCountry] = useState("");
 
+  // Set greeting
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning!");
     else if (hour < 18) setGreeting("Good afternoon!");
     else setGreeting("Good evening!");
-    
-    // Only fetch profile if user is available and has an ID
-    if (user && user.id) {
-      fetchProfile();
-    } else {
+  }, []);
+
+  // Detect user country
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        if (data?.country_name) setCountry(data.country_name);
+      } catch (err) {
+        console.error("Failed to detect country:", err);
+      }
+    };
+    detectCountry();
+  }, []);
+
+  // Fetch profile
+  useEffect(() => {
+    if (user?.id) fetchProfile();
+    else {
       setLoading(false);
       setError("Please log in to view your profile.");
     }
   }, [user]);
 
   const fetchProfile = async () => {
-  // Debug: log the API base URL being used
-  // @ts-ignore
-  console.log("API base URL:", require("@/config/api").API_CONFIG.backend);
-    if (!user || !user.id) {
-      setError("User ID not available. Please log in again.");
-      setLoading(false);
-      return;
-    }
-
+    if (!user?. id) return setError("User ID not available.");
     try {
       setLoading(true);
-      setError("");
-      
-    // Try to fetch complete user data from backend using user ID
-    const profileData = await getUserProfileById(user.id);
-    // Debug: log the full profile data
-    console.log("Fetched profile data:", profileData);
-    setProfile(profileData);
-    // Set form fields with fetched data
-    setName(profileData.name || "");
-    setEmail(profileData.email || "");
-    setPhoneNumber(profileData.phoneNumber || ""); 
-    setLocation(profileData.location || "");
-    setProfilePic(profileData.profilePicture || null);
-    setPaymentMethods(profileData.paymentMethods || []);
-    setSubscriptionPlan(profileData.subscriptionPlan || "");
-    setCountry(profileData.country || "");
-      
+      const profileData = await getUserProfileById(user.id);
+      setProfile(profileData);
+      setName(profileData.name || "");
+      setEmail(profileData.email || "");
+      setPhoneNumber(profileData.phoneNumber || "");
+      setLocation(profileData.location || "");
+      setProfilePic(profileData.profilePicture || null);
+      setPaymentMethods(profileData.paymentMethods || []);
     } catch (err: any) {
       setError(`Unable to load profile data: ${err.message}`);
     } finally {
@@ -82,93 +81,42 @@ export default function Profile() {
     }
   };
 
-  // Handle profile picture upload
-  const handleProfilePicChange = async (
-    
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (!user || !user.id) {
-      setError("User ID not available. Please log in again.");
-      return;
-    }
-
+  const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user?.id) return setError("User ID not available.");
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
-        return;
-      }
-      
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setError("Please select a valid image file");
-        return;
-      }
-      
+      if (file.size > 5 * 1024 * 1024) return setError("File size must be less than 5MB");
+      if (!file.type.startsWith("image/")) return setError("Please select a valid image file");
+
       try {
         setUploading(true);
-        setError("");
-        
-        try {
-          // Try to upload to backend using user ID
-          const profilePictureUrl = await uploadProfilePictureById(
-            user.id,
-            file
-          );
-          setProfilePic(profilePictureUrl);
-          
-          // Update profile in backend with new picture URL
-          await updateUserProfileById(user.id, { profilePicture: profilePictureUrl });
-          
-          setMessage("Profile picture updated successfully!");
-        } catch (backendError: any) {
-          setError(`Failed to upload profile picture: ${backendError.message}`);
-        }
-        
+        const profilePictureUrl = await uploadProfilePictureById(user.id, file);
+        setProfilePic(profilePictureUrl);
+        await updateUserProfileById(user.id, { profilePicture: profilePictureUrl });
+        setMessage("Profile picture updated!");
         setTimeout(() => setMessage(""), 3000);
       } catch (err: any) {
-        setError(err.message);
+        setError(`Failed to upload: ${err.message}`);
       } finally {
         setUploading(false);
       }
     }
   };
 
-  // Save profile changes 
   const handleSave = async () => {
-    if (!user || !user.id) {
-      setError("User ID not available. Please log in again.");
-      return;
-    }
-
+    if (!user?.id) return setError("User ID not available.");
     try {
       setSaving(true);
-      setError("");
-      
-      const updatedProfile = {
-        name,
-        email,
-        phoneNumber,
-        location,
-        paymentMethods,
-        subscriptionPlan,
-        country
-      };
-      
-      // Update via backend using user ID
-      const result = await updateUserProfileById(user.id, updatedProfile);
-      
+      const updatedProfile = { name, email, phoneNumber, location, paymentMethods };
+      await updateUserProfileById(user.id, updatedProfile);
       setMessage("Profile updated successfully!");
       setShowModal(true);
       setTimeout(() => {
         setMessage("");
         setShowModal(false);
       }, 2000);
-      
     } catch (err: any) {
-      setError(`Failed to save profile changes: ${err.message}`);
+      setError(`Failed to save profile: ${err.message}`);
     } finally {
       setSaving(false);
     }
@@ -178,7 +126,7 @@ export default function Profile() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-pink-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -186,38 +134,31 @@ export default function Profile() {
   }
 
   return (
-    <div className="pb-16 p-4">
+    <div className="pb-16 p-4 bg-gray-50 min-h-screen">
       {/* Greeting */}
-      <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white">
-        <h2 className="text-lg font-bold">{greeting} {name || "User"}!</h2>
-        <p className="text-white">
-          Update your profile information below.
-        </p>
+      <div className="mb-6 p-6 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow text-white text-center">
+        <h2 className="text-2xl font-bold">{greeting} {name || 'User'}!</h2>
+        <p className="mt-2 text-sm">Update your profile information below.</p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p>{error}</p>
-          <button 
-            onClick={() => setError("")}
-            className="mt-2 text-sm underline hover:no-underline"
-          >
-            Dismiss
-          </button>
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded shadow-md flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError("")} className="text-sm font-semibold underline hover:no-underline">Dismiss</button>
         </div>
       )}
 
       {/* Profile Card */}
-      <div className="bg-white p-6 rounded shadow max-w-md mx-auto flex flex-col items-center gap-4">
-        {/* Profile Picture - ENABLED for updates */}
-        <div className="relative">
+      <div className="bg-white p-8 rounded-3xl shadow-lg max-w-2xl mx-auto flex flex-col items-center gap-6">
+        {/* Profile Picture */}
+        <div className="relative group">
           <img
             src={profilePic || "/assets/Profile.png"}
             alt="Profile"
-            className="w-24 h-24 rounded-full object-cover border"
+            className="w-28 h-28 rounded-full object-cover border-4 border-pink-200 shadow-sm transition-all duration-300 group-hover:scale-105"
           />
-          <label className={`absolute bottom-0 right-0 bg-pink-500 text-white p-1 rounded-full cursor-pointer hover:bg-pink-600 ${uploading ? "opacity-50" : ""}`}>
+          <label className={`absolute bottom-0 right-0 bg-pink-500 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all duration-300 group-hover:bg-pink-600 ${uploading ? 'opacity-50' : ''}`}>
             <input 
               type="file" 
               accept="image/*" 
@@ -229,57 +170,59 @@ export default function Profile() {
           </label>
         </div>
 
-        {/* Editable Fields - ENABLED for updates */}
-        <div className="w-full flex flex-col gap-3">
+        {/* Form Fields Grid */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
               disabled={saving}
+              className="w-full border p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
               placeholder="Enter your name"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
               disabled={saving}
+              className="w-full border p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
               placeholder="Enter your email"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Phone
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
             <input
               type="text"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
               disabled={saving}
+              className="w-full border p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
               placeholder="Enter your phone number"
             />
           </div>
+
+          {/* Read-only Country */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Location
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Country</label>
+            <span className="inline-block w-full p-3 rounded-xl bg-gray-100 text-gray-700 cursor-not-allowed border">{country}</span>
+          </div>
+
+          {/* User-entered Location */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-600 mb-1">Location</label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
               disabled={saving}
+              className="w-full border p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
               placeholder="Enter your location"
             />
           </div>
@@ -318,40 +261,21 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Update Button */}
+        {/* Save Button */}
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`mt-4 w-full px-4 py-2 rounded transition ${
-            saving 
-              ? "bg-gray-400 cursor-not-allowed" 
-              : "bg-pink-500 hover:bg-pink-600"
-          } text-white`}
+          className={`mt-4 w-full py-3 rounded-2xl text-white font-semibold text-lg transition ${
+            saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'
+          }`}
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
 
-        {/* Success Message */}
-        {message && <p className="text-green-500 mt-2">{message}</p>}
-
-        {/* Modal Dialog */}
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white border border-green-500 rounded-lg shadow-lg p-6 flex flex-col items-center">
-              <span className="text-green-600 text-xl font-bold mb-2">
-                
-                Success!
-                
-              </span>
-              <span className="text-gray-700 mb-4">Profile has been updated successfully.</span>
-              <button
-                className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
-                onClick={() => setShowModal(false)}
-              >
-                OK
-              </button>
-            </div>
-            <div className="fixed inset-0 bg-black opacity-30 z-40" />
+        {/* Success Toast */}
+        {message && (
+          <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in-out">
+            {message}
           </div>
         )}
       </div>
