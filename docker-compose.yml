@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile.prod
       args:
         NODE_ENV: production
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_USE_PROXY: ${NEXT_PUBLIC_USE_PROXY:-false}
 
     # Load production environment variables
     env_file:
@@ -14,6 +16,8 @@ services:
     # Production environment variables
     environment:
       - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      - NEXT_PUBLIC_USE_PROXY=${NEXT_PUBLIC_USE_PROXY:-false}
 
     restart: unless-stopped
     ports:

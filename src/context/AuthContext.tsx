@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser, logout } from "@/app/api/auth";
+import { getCurrentUser, logout } from "@/lib/api/auth";
 
 export interface AuthUser {
   id: string;
@@ -26,48 +26,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const storedUser = getCurrentUser();
-    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-    const userId = typeof window !== 'undefined' ? localStorage.getItem("userId") : null;
-    
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const userId =
+      typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+
     if (storedUser && token) {
       // Ensure the user object has the required fields
       const normalizedUser: AuthUser = {
-        id: storedUser.id || userId || '0',
-        name: storedUser.name || storedUser.username || 'Unknown User',
-        email: storedUser.email || '',
-        ...storedUser
+        id: storedUser.id || userId || "0",
+        name: storedUser.name || storedUser.username || "Unknown User",
+        email: storedUser.email || "",
+        ...storedUser,
       };
-      
+
       setUser(normalizedUser);
     } else {
       setUser(null);
       // Clear any invalid storage
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
         localStorage.removeItem("userId");
         localStorage.removeItem("stylist_id");
       }
     }
-    
+
     setLoading(false);
   }, []);
 
   // Function to manually refresh auth state
   const refreshAuthState = () => {
     const storedUser = getCurrentUser();
-    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-    const userId = typeof window !== 'undefined' ? localStorage.getItem("userId") : null;
-    
-    
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const userId =
+      typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+
     if (storedUser && token) {
       const normalizedUser: AuthUser = {
-        id: storedUser.id || userId || '0',
-        name: storedUser.name || storedUser.username || 'Unknown User',
-        email: storedUser.email || '',
-        ...storedUser
+        id: storedUser.id || userId || "0",
+        name: storedUser.name || storedUser.username || "Unknown User",
+        email: storedUser.email || "",
+        ...storedUser,
       };
-      
+
       setUser(normalizedUser);
     } else {
       setUser(null);
@@ -77,29 +80,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Listen for storage changes (e.g., after login)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'token' || e.key === 'userInfo') {
+      if (e.key === "token" || e.key === "userInfo") {
         refreshAuthState();
       }
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", handleStorageChange);
+      return () => window.removeEventListener("storage", handleStorageChange);
     }
   }, []);
 
   const loginUser = (userData: AuthUser, token: string) => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
       localStorage.setItem("userInfo", JSON.stringify(userData));
       localStorage.setItem("userId", userData.id.toString());
-      
+
       // If stylist_id is in userData, store it too
       if (userData.stylist_id) {
         localStorage.setItem("stylist_id", userData.stylist_id.toString());
       }
     }
-    
+
     setUser(userData);
   };
 
@@ -133,5 +136,4 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
-
 };

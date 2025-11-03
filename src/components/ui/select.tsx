@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, createContext, useContext } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 
 // Context for Select
 const SelectContext = createContext<any>(null);
@@ -24,18 +30,22 @@ export const Select: React.FC<{
         setOpen(false);
       }
     };
-    if (open) document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    if (open) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
   return (
-    <SelectContext.Provider value={{ value, onValueChange, open, setOpen, triggerRef, contentRef }}>
+    <SelectContext.Provider
+      value={{ value, onValueChange, open, setOpen, triggerRef, contentRef }}
+    >
       <div className="relative">{children}</div>
     </SelectContext.Provider>
   );
 };
 
-export const SelectTrigger: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SelectTrigger: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { setOpen, triggerRef } = useContext(SelectContext);
   return (
     <button
@@ -50,12 +60,18 @@ export const SelectTrigger: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-export const SelectValue: React.FC<{ placeholder?: string }> = ({ placeholder }) => {
+export const SelectValue: React.FC<{ placeholder?: string }> = ({
+  placeholder,
+}) => {
   const { value } = useContext(SelectContext);
-  return <span className={value ? '' : 'text-gray-400'}>{value || placeholder}</span>;
+  return (
+    <span className={value ? "" : "text-gray-400"}>{value || placeholder}</span>
+  );
 };
 
-export const SelectContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SelectContent: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { open, contentRef } = useContext(SelectContext);
   if (!open) return null;
   return (
@@ -68,7 +84,10 @@ export const SelectContent: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-export const SelectItem: React.FC<{ value: string; children: React.ReactNode }> = ({ value, children }) => {
+export const SelectItem: React.FC<{
+  value: string;
+  children: React.ReactNode;
+}> = ({ value, children }) => {
   const { onValueChange, setOpen } = useContext(SelectContext);
   return (
     <div

@@ -1,10 +1,8 @@
 "use client";
 
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboards/app-sidebar";
 import { usePendingBookingsCount } from "@/hooks/use-pending-bookings-count";
-
 
 export default function DashboardLayout({
   children,

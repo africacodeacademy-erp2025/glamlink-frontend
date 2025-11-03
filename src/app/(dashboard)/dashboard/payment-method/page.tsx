@@ -4,9 +4,13 @@ import {
   fetchStylistPaymentMethods,
   savePaymentMethod,
   EditPaymentMethod,
-  deletePaymentMethod
-} from "@/app/api/payment-method";
-import { fetchStylistBookingFee, saveBookingFee,updateStylistBookingFee } from "@/app/api/bookingFee";
+  deletePaymentMethod,
+} from "@/lib/api/payment-method";
+import {
+  fetchStylistBookingFee,
+  saveBookingFee,
+  updateStylistBookingFee,
+} from "@/lib/api/bookingFee";
 import { useAuth } from "@/context/AuthContext";
 
 export default function PaymentMethodPage() {
@@ -26,7 +30,9 @@ export default function PaymentMethodPage() {
   const [stylistMethods, setStylistMethods] = useState<any[]>([]);
   const [methodsLoading, setMethodsLoading] = useState(false);
   const [editingFee, setEditingFee] = useState(false);
-  const [editingBookingFee, setEditingBookingFee] = useState<number | null>(null);
+  const [editingBookingFee, setEditingBookingFee] = useState<number | null>(
+    null
+  );
   const [newBookingFee, setNewBookingFee] = useState<number | null>(null);
 
   useEffect(() => {
@@ -111,7 +117,11 @@ export default function PaymentMethodPage() {
     setError("");
     setPaymentSuccess("");
     try {
-      await EditPaymentMethod(editingId, editingMethodName, editingAccountNumber);
+      await EditPaymentMethod(
+        editingId,
+        editingMethodName,
+        editingAccountNumber
+      );
       setEditingId(null);
       setEditingMethodName("");
       setEditingAccountNumber("");
@@ -191,23 +201,38 @@ export default function PaymentMethodPage() {
           ) : (
             <div className="flex items-center gap-4">
               {editingFee ? (
-                <form onSubmit={handleEditFeeSubmit} className="flex items-center gap-2">
+                <form
+                  onSubmit={handleEditFeeSubmit}
+                  className="flex items-center gap-2"
+                >
                   <input
                     type="number"
                     value={editingBookingFee ?? ""}
-                    onChange={e => setEditingBookingFee(Number(e.target.value))}
+                    onChange={(e) =>
+                      setEditingBookingFee(Number(e.target.value))
+                    }
                     className="border p-2 rounded"
                     placeholder="Booking Fee (%)"
                     required
                     min={0}
                   />
-                  <button type="submit" className="text-green-600 font-bold">Save</button>
-                  <button type="button" className="text-gray-500" onClick={() => setEditingFee(false)}>Cancel</button>
+                  <button type="submit" className="text-green-600 font-bold">
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="text-gray-500"
+                    onClick={() => setEditingFee(false)}
+                  >
+                    Cancel
+                  </button>
                 </form>
               ) : (
                 <>
                   <span className="font-semibold text-pink-700">
-                    {bookingFee !== null ? `${bookingFee}%` : "No booking fee set."}
+                    {bookingFee !== null
+                      ? `${bookingFee}%`
+                      : "No booking fee set."}
                   </span>
                   {bookingFee !== null && (
                     <button
@@ -224,8 +249,13 @@ export default function PaymentMethodPage() {
         </div>
 
         {bookingFee === null && (
-          <form onSubmit={handleBookingFeeSubmit} className="p-4 bg-white rounded shadow mb-6">
-            <label className="block mb-2 font-medium">Set Booking Fee (%)</label>
+          <form
+            onSubmit={handleBookingFeeSubmit}
+            className="p-4 bg-white rounded shadow mb-6"
+          >
+            <label className="block mb-2 font-medium">
+              Set Booking Fee (%)
+            </label>
             <input
               type="number"
               value={newBookingFee ?? ""}
@@ -248,7 +278,9 @@ export default function PaymentMethodPage() {
         )}
 
         <div className="bg-white rounded shadow p-4 mt-6">
-          <h2 className="text-lg font-bold mb-4">Payment Methods Linked to You</h2>
+          <h2 className="text-lg font-bold mb-4">
+            Payment Methods Linked to You
+          </h2>
           {error && <p className="text-red-600 mb-2">{error}</p>}
           {methodsLoading ? (
             <p>Loading...</p>
@@ -259,34 +291,58 @@ export default function PaymentMethodPage() {
               {stylistMethods.map((pm: any, idx: number) => (
                 <li key={pm.id || idx} className="mb-2 flex items-center gap-2">
                   {editingId === pm.id ? (
-                    <form onSubmit={handleEditSubmit} className="flex flex-col gap-2 w-full">
-                      <label className="text-xs font-medium text-gray-700">Payment Name</label>
+                    <form
+                      onSubmit={handleEditSubmit}
+                      className="flex flex-col gap-2 w-full"
+                    >
+                      <label className="text-xs font-medium text-gray-700">
+                        Payment Name
+                      </label>
                       <input
                         type="text"
                         value={editingMethodName}
-                        onChange={e => setEditingMethodName(e.target.value)}
+                        onChange={(e) => setEditingMethodName(e.target.value)}
                         className="border p-2 rounded mb-2"
                         placeholder="Payment Name"
                         required
                       />
-                      <label className="text-xs font-medium text-gray-700">Account/Mobile Number</label>
+                      <label className="text-xs font-medium text-gray-700">
+                        Account/Mobile Number
+                      </label>
                       <input
                         type="text"
                         value={editingAccountNumber}
-                        onChange={e => setEditingAccountNumber(e.target.value)}
+                        onChange={(e) =>
+                          setEditingAccountNumber(e.target.value)
+                        }
                         className="border p-2 rounded mb-2"
                         placeholder="Account/Mobile Number"
                         required
                       />
                       <div className="flex gap-2 mt-2">
-                        <button type="submit" className="text-green-600 font-bold">Save</button>
-                        <button type="button" className="text-gray-500" onClick={() => setEditingId(null)}>Cancel</button>
+                        <button
+                          type="submit"
+                          className="text-green-600 font-bold"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="text-gray-500"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </form>
                   ) : (
                     <>
-                      <span className="font-semibold">{pm.paymentName || "Unnamed Method"}</span>
-                      <span className="text-xs text-gray-500">{pm.accountNumber}</span>
+                      <span className="font-semibold">
+                        {pm.paymentName || "Unnamed Method"}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {pm.accountNumber}
+                      </span>
                       <button
                         className="text-blue-600 font-bold ml-2"
                         onClick={() => handleEdit(pm)}
@@ -307,7 +363,10 @@ export default function PaymentMethodPage() {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 bg-white rounded shadow mb-6">
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 bg-white rounded shadow mb-6"
+        >
           <label className="block mb-2 font-medium">Payment Method Name</label>
           <input
             type="text"
@@ -317,7 +376,9 @@ export default function PaymentMethodPage() {
             className="w-full border p-2 rounded mb-4"
             required
           />
-          <label className="block mb-2 font-medium">Payment Account/Mobile Number</label>
+          <label className="block mb-2 font-medium">
+            Payment Account/Mobile Number
+          </label>
           <input
             type="text"
             value={accountNumber}
@@ -333,7 +394,9 @@ export default function PaymentMethodPage() {
           >
             {loading ? "Saving..." : "Add Payment Method"}
           </button>
-          {paymentSuccess && <p className="text-green-600 mt-2">{paymentSuccess}</p>}
+          {paymentSuccess && (
+            <p className="text-green-600 mt-2">{paymentSuccess}</p>
+          )}
           {error && <p className="text-red-600 mt-2">{error}</p>}
         </form>
       </div>

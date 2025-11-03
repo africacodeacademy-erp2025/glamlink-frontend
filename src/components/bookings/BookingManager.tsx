@@ -1,21 +1,34 @@
 // components/AppointmentManager.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, List, Clock, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Booking, BookingStatus, fetchBookings as fetchBookingsApi, updateBookingStatus, rescheduleBooking, cancelBooking } from '@/app/api/bookings';
-import { useAuth } from '@/context/AuthContext';
-import BookingCalendar from './BookingCalendar';
-import BookingList from './BookingList';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, List, Clock, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Booking,
+  BookingStatus,
+  fetchBookings as fetchBookingsApi,
+  updateBookingStatus,
+  rescheduleBooking,
+  cancelBooking,
+} from "@/lib/api/bookings";
+import { useAuth } from "@/context/AuthContext";
+import BookingCalendar from "./BookingCalendar";
+import BookingList from "./BookingList";
 
-import { updateSlotBookedStatus } from '@/app/api/timeslots';
-import UpcomingBookings from './UpcomingBookings';
-import { useQueryClient } from '@tanstack/react-query';
+import { updateSlotBookedStatus } from "@/lib/api/timeslots";
+import UpcomingBookings from "./UpcomingBookings";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function BookingManager() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -24,7 +37,9 @@ export default function BookingManager() {
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   // Reschedule state
-  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
+  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(
+    null
+  );
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [serviceNames, setServiceNames] = useState<Record<string, string>>({});
@@ -35,44 +50,57 @@ export default function BookingManager() {
     if (booking.serviceId && serviceNames[booking.serviceId]) {
       return serviceNames[booking.serviceId];
     }
-    if (booking.service && typeof booking.service === 'object' && 'name' in booking.service) {
+    if (
+      booking.service &&
+      typeof booking.service === "object" &&
+      "name" in booking.service
+    ) {
       return booking.service.name;
     }
-    return 'Unknown Service';
+    return "Unknown Service";
   };
 
   const getStartTime = (booking: Booking): string => {
     if (booking.slotId && slotTimes[booking.slotId]) {
       return slotTimes[booking.slotId];
     }
-    return '';
+    return "";
   };
 
   const formatBookingDate = (booking: Booking): string => {
-    const slotDateStr = getStartTime(booking) || booking.bookedAt || booking.createdAt || booking.updatedAt;
+    const slotDateStr =
+      getStartTime(booking) ||
+      booking.bookedAt ||
+      booking.createdAt ||
+      booking.updatedAt;
     if (slotDateStr) {
       const date = new Date(slotDateStr);
       if (!isNaN(date.getTime())) {
-        return date.toLocaleString('en-US');
+        return date.toLocaleString("en-US");
       }
     }
-    return '';
+    return "";
   };
 
   // Reschedule booking action
   const rescheduleBookingAction = async (id: string, newDateTime: string) => {
     try {
       if (typeof user?.id === "string") {
-        await rescheduleBooking(id, newDateTime, user.id, BookingStatus.RESCHEDULED);
-        toast.success('Booking rescheduled successfully!');
+        await rescheduleBooking(
+          id,
+          newDateTime,
+          user.id,
+          BookingStatus.RESCHEDULED
+        );
+        toast.success("Booking rescheduled successfully!");
         await fetchBookings(user.id);
         // Invalidate queries to refresh dashboard
-        queryClient.invalidateQueries({ queryKey: ['bookings', user.id] });
+        queryClient.invalidateQueries({ queryKey: ["bookings", user.id] });
       } else {
         throw new Error("User ID is not available for rescheduling booking.");
       }
     } catch (error) {
-      toast.error('Failed to reschedule booking');
+      toast.error("Failed to reschedule booking");
     }
   };
 
@@ -90,7 +118,7 @@ export default function BookingManager() {
     if (startTime) {
       const date = new Date(startTime);
       if (!isNaN(date.getTime())) {
-        setSelectedDate(date.toISOString().split('T')[0]);
+        setSelectedDate(date.toISOString().split("T")[0]);
         setSelectedTime(date.toTimeString().slice(0, 5));
       } else {
         setSelectedDate("");
@@ -109,8 +137,6 @@ export default function BookingManager() {
     handleCancelReschedule();
   };
 
-
-
   // Fetch bookings using the new API utility
   const fetchBookings = async (userId: string | undefined) => {
     try {
@@ -126,7 +152,7 @@ export default function BookingManager() {
         slotTimes
       );
     } catch (error) {
-      toast.error('Failed to load bookings');
+      toast.error("Failed to load bookings");
     } finally {
       setLoading(false);
     }
@@ -142,51 +168,47 @@ export default function BookingManager() {
   const confirmBooking = async (id: string) => {
     try {
       await updateBookingStatus(id, BookingStatus.CONFIRMED);
-      const booking = bookings.find(b => b.id === id);
+      const booking = bookings.find((b) => b.id === id);
       // Optionally update slot status if needed
       // if (booking && booking.slotId) {
       //   await updateSlotBookedStatus(booking.slotId, true);
       // }
-      toast.success('Booking confirmed successfully!');
+      toast.success("Booking confirmed successfully!");
       if (user?.id) {
         await fetchBookings(user.id);
         // Invalidate queries to refresh dashboard
-        queryClient.invalidateQueries({ queryKey: ['bookings', user.id] });
+        queryClient.invalidateQueries({ queryKey: ["bookings", user.id] });
       }
     } catch (error) {
-      toast.error('Failed to confirm booking');
+      toast.error("Failed to confirm booking");
     }
   };
 
   const cancelBookingAction = async (id: string) => {
     try {
       await cancelBooking(id);
-      toast.success('Booking cancelled successfully!');
+      toast.success("Booking cancelled successfully!");
       if (user?.id) {
         await fetchBookings(user.id);
         // Invalidate queries to refresh dashboard
-        queryClient.invalidateQueries({ queryKey: ['bookings', user.id] });
+        queryClient.invalidateQueries({ queryKey: ["bookings", user.id] });
       }
     } catch (error) {
-      toast.error('Failed to cancel booking');
+      toast.error("Failed to cancel booking");
     }
   };
-
-
-
-
 
   const completeBooking = async (id: string) => {
     try {
       await updateBookingStatus(id, BookingStatus.COMPLETED);
-      toast.success('Booking marked as completed!');
+      toast.success("Booking marked as completed!");
       if (user?.id) {
         await fetchBookings(user.id);
         // Invalidate queries to refresh dashboard
-        queryClient.invalidateQueries({ queryKey: ['bookings', user.id] });
+        queryClient.invalidateQueries({ queryKey: ["bookings", user.id] });
       }
     } catch (error) {
-      toast.error('Failed to complete booking');
+      toast.error("Failed to complete booking");
     }
   };
 
@@ -194,28 +216,32 @@ export default function BookingManager() {
   const getStats = () => {
     // Get today's date in YYYY-MM-DD format
     const today = new Date();
-    const todayDateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
-    const todayBookings = bookings.filter(b => {
+    const todayDateString = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const todayBookings = bookings.filter((b) => {
       // Get the slot start_time for this booking
       const slotId = b.slotId || b.slot_id;
       if (!slotId || !slotTimes[slotId]) {
         return false; // Skip if no slot time available
       }
-      
+
       const startTime = slotTimes[slotId];
       // Extract just the date part (YYYY-MM-DD) from the slot time
-      const bookingDateString = startTime.split('T')[0];
-      
+      const bookingDateString = startTime.split("T")[0];
+
       // Compare just the date strings
       return bookingDateString === todayDateString;
     });
-    
+
     return {
       total: bookings.length,
       today: todayBookings.length,
-      confirmed: bookings.filter(b => b.status === BookingStatus.CONFIRMED).length,
-      pending: bookings.filter(b => b.status === BookingStatus.PENDING).length,
+      confirmed: bookings.filter((b) => b.status === BookingStatus.CONFIRMED)
+        .length,
+      pending: bookings.filter((b) => b.status === BookingStatus.PENDING)
+        .length,
     };
   };
 
@@ -238,12 +264,10 @@ export default function BookingManager() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white">
-          <div >
+          <div>
             <h1 className="text-lg font-bold">Booking Management</h1>
-            
-            <p className="text-gray-200">
-              Manage and schedule client bookings
-            </p>
+
+            <p className="text-gray-200">Manage and schedule client bookings</p>
           </div>
         </div>
 
@@ -251,7 +275,9 @@ export default function BookingManager() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-pink-100">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Bookings
+              </CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -260,7 +286,9 @@ export default function BookingManager() {
           </Card>
           <Card className="bg-pink-100">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Today's Bookings
+              </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -298,7 +326,10 @@ export default function BookingManager() {
           <CardContent>
             <Tabs defaultValue="calendar" className="space-y-4">
               <TabsList>
-                <TabsTrigger value="calendar" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="calendar"
+                  className="flex items-center gap-2"
+                >
                   <Calendar className="h-4 w-4" />
                   Calendar View
                 </TabsTrigger>
@@ -306,7 +337,10 @@ export default function BookingManager() {
                   <List className="h-4 w-4" />
                   List View
                 </TabsTrigger>
-                <TabsTrigger value="upcoming" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="upcoming"
+                  className="flex items-center gap-2"
+                >
                   <Clock className="h-4 w-4" />
                   Upcoming
                 </TabsTrigger>
@@ -334,58 +368,53 @@ export default function BookingManager() {
                 />
               </TabsContent>
 
-
               <TabsContent value="upcoming" className="space-y-4">
-                <UpcomingBookings
-                  bookings={bookings}
-                  onEdit={() => {}}
-                />
+                <UpcomingBookings bookings={bookings} onEdit={() => {}} />
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
-      {/* Reschedule Modal */}
-      {rescheduleBookingId !== null && (
-        <div className="fixed inset-0 bg-pink bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded shadow w-80">
-          <h3 className="text-lg font-bold mb-4">Reschedule Booking</h3>
-          <label className="block mb-2 text-sm font-medium text-gray-700">
-          Select Date
-          </label>
-          <input
-          type="date"
-          className="border p-2 rounded w-full mb-4"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          />
-          <label className="block mb-2 text-sm font-medium text-gray-700">
-          Select Time
-          </label>
-          <input
-          type="time"
-          className="border p-2 rounded w-full mb-4"
-          value={selectedTime}
-          onChange={(e) => setSelectedTime(e.target.value)}
-          />
-          <div className="flex justify-end gap-2">
-          <button
-            onClick={handleCancelReschedule}
-            className="px-3 py-1 rounded border hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSaveReschedule}
-            className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
-          >
-            Save
-          </button>
+        {/* Reschedule Modal */}
+        {rescheduleBookingId !== null && (
+          <div className="fixed inset-0 bg-pink bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow w-80">
+              <h3 className="text-lg font-bold mb-4">Reschedule Booking</h3>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Select Date
+              </label>
+              <input
+                type="date"
+                className="border p-2 rounded w-full mb-4"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Select Time
+              </label>
+              <input
+                type="time"
+                className="border p-2 rounded w-full mb-4"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={handleCancelReschedule}
+                  className="px-3 py-1 rounded border hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveReschedule}
+                  className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        </div>
-      )}
-
-    </div>
+        )}
+      </div>
     </div>
   );
 }

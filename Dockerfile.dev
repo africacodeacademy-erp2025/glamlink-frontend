@@ -22,6 +22,9 @@ COPY postcss.config.mjs .
 COPY components.json .
 # COPY next-env.d.ts .
 
+# Environment variables for development
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+
 # Optional: Disable Next.js telemetry
 # ENV NEXT_TELEMETRY_DISABLED 1
 

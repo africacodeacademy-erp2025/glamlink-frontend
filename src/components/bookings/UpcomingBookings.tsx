@@ -1,15 +1,32 @@
 // components/UpcomingAppointments.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, Send, Loader2 } from 'lucide-react';
-import { Booking, BookingStatus } from '@/app/api/bookings';
-
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Edit, Send, Loader2 } from "lucide-react";
+import { Booking, BookingStatus } from "@/lib/api/bookings";
 
 interface UpcomingBookingsProps {
   bookings: Booking[];
@@ -17,14 +34,17 @@ interface UpcomingBookingsProps {
   onSendReminder?: (id: string) => void;
 }
 
-
-export default function UpcomingBookings({ bookings, onEdit, onSendReminder }: UpcomingBookingsProps) {
+export default function UpcomingBookings({
+  bookings,
+  onEdit,
+  onSendReminder,
+}: UpcomingBookingsProps) {
   // Filter bookings for the next 7 days
   const now = new Date();
   const sevenDaysFromNow = new Date(now);
   sevenDaysFromNow.setDate(now.getDate() + 7);
   const upcomingBookings = (bookings || []).filter((b: Booking) => {
-    const date = new Date(b.bookedAt || b.date || b.slotDate || '');
+    const date = new Date(b.bookedAt || b.date || b.slotDate || "");
     return date >= now && date <= sevenDaysFromNow;
   });
   const loading = false;
@@ -34,23 +54,26 @@ export default function UpcomingBookings({ bookings, onEdit, onSendReminder }: U
     const bookingTime = new Date(dateStr);
     const diffMs = bookingTime.getTime() - now.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffHours = Math.floor(
+      (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
     if (diffDays > 0) {
       return `${diffDays}d ${diffHours}h`;
     } else if (diffHours > 0) {
       return `${diffHours}h`;
     } else {
-      return 'Soon';
+      return "Soon";
     }
   };
 
   const getUrgencyColor = (dateStr: string) => {
     const now = new Date();
     const bookingTime = new Date(dateStr);
-    const diffHours = (bookingTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-    if (diffHours < 24) return 'text-red-600 bg-red-100';
-    if (diffHours < 48) return 'text-orange-600 bg-orange-100';
-    return 'text-green-600 bg-green-100';
+    const diffHours =
+      (bookingTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    if (diffHours < 24) return "text-red-600 bg-red-100";
+    if (diffHours < 48) return "text-orange-600 bg-orange-100";
+    return "text-green-600 bg-green-100";
   };
 
   if (loading) {
@@ -59,7 +82,9 @@ export default function UpcomingBookings({ bookings, onEdit, onSendReminder }: U
         <CardContent className="flex justify-center items-center p-8">
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-muted-foreground">Loading upcoming bookings...</p>
+            <p className="text-muted-foreground">
+              Loading upcoming bookings...
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -95,22 +120,39 @@ export default function UpcomingBookings({ bookings, onEdit, onSendReminder }: U
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">
-                      {new Date(booking.bookedAt || booking.date || booking.slotDate).toLocaleDateString()}
+                      {new Date(
+                        booking.bookedAt || booking.date || booking.slotDate
+                      ).toLocaleDateString()}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {new Date(booking.bookedAt || booking.date || booking.slotDate).toLocaleTimeString()}
+                      {new Date(
+                        booking.bookedAt || booking.date || booking.slotDate
+                      ).toLocaleTimeString()}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={getUrgencyColor(booking.bookedAt || booking.date || booking.slotDate)}>
-                      {getTimeUntilBooking(booking.bookedAt || booking.date || booking.slotDate)}
+                    <Badge
+                      variant="secondary"
+                      className={getUrgencyColor(
+                        booking.bookedAt || booking.date || booking.slotDate
+                      )}
+                    >
+                      {getTimeUntilBooking(
+                        booking.bookedAt || booking.date || booking.slotDate
+                      )}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {booking.serviceDisplayName || booking.serviceName || "-"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={booking.status === BookingStatus.CONFIRMED ? "default" : "outline"}>
+                    <Badge
+                      variant={
+                        booking.status === BookingStatus.CONFIRMED
+                          ? "default"
+                          : "outline"
+                      }
+                    >
                       {booking.status}
                     </Badge>
                   </TableCell>

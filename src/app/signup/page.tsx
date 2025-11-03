@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { register } from "@/app/api/auth";
+import { register } from "@/lib/api/auth";
 import SubscriptionPlans from "@/components/general/SubscriptionPlans";
 
 function SignUpForm() {
@@ -15,6 +15,14 @@ function SignUpForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [location, setLocation] = useState("");
+  const [country, setCountry] = useState("");
+  // Simple country list
+  const countryList = [
+    "Lesotho",
+    "Botswana",
+    "South Africa",
+    "United States"
+  ];
   const [priceRangeMin, setPriceRangeMin] = useState<number>(50);
   const [priceRangeMax, setPriceRangeMax] = useState<number>(200);
 
@@ -58,10 +66,11 @@ function SignUpForm() {
       !phone ||
       !email ||
       !location ||
+      !country ||
       !password ||
       !confirmPassword
     ) {
-      setError("Please fill in all fields.");
+      setError("Please fill in all fields, including country.");
       setIsLoading(false);
       return;
     }
@@ -83,9 +92,10 @@ function SignUpForm() {
         phoneNumber: phone,
         password,
         location,
+        country,
         priceRangeMin,
         priceRangeMax,
-        plan: selectedPlan || "Free",
+        subscription_plan: selectedPlan || "Free",
       });
 
       setIsSuccess(true);
@@ -204,6 +214,18 @@ function SignUpForm() {
                 required
                 disabled={isLoading}
               />
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+                required
+                disabled={isLoading}
+              >
+                <option value="">Select Country</option>
+                {countryList.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
 
               <div className="flex gap-2">
                 <div className="w-1/2">

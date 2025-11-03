@@ -27,6 +27,9 @@ export default function Profile() {
   const [country, setCountry] = useState(""); // auto-detected, readonly
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
+  const [subscriptionPlan, setSubscriptionPlan] = useState("");
+  const countryList = ["Botswana", "Lesotho", "South Africa", "United States"];
+  const [country, setCountry] = useState("");
 
   // Set greeting
   useEffect(() => {
@@ -60,7 +63,7 @@ export default function Profile() {
   }, [user]);
 
   const fetchProfile = async () => {
-    if (!user?.id) return setError("User ID not available.");
+    if (!user?. id) return setError("User ID not available.");
     try {
       setLoading(true);
       const profileData = await getUserProfileById(user.id);
@@ -163,7 +166,7 @@ export default function Profile() {
               onChange={handleProfilePicChange}
               disabled={uploading}
             />
-            {uploading ? '⏳' : '✎'}
+            {uploading ? "⏳" : "✎"}
           </label>
         </div>
 
@@ -223,6 +226,39 @@ export default function Profile() {
               placeholder="Enter your location"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Country
+            </label>
+            <select
+              value={country}
+              onChange={e => setCountry(e.target.value)}
+              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
+              disabled={saving}
+              required
+            >
+              <option value="">Select Country</option>
+              {countryList.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Subscription Plan
+            </label>
+            <select
+              value={subscriptionPlan}
+              onChange={e => setSubscriptionPlan(e.target.value)}
+              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300 font-semibold"
+              disabled={saving}
+              required
+            >
+              <option value="">Select Plan</option>
+              <option value="Free">Free</option>
+              <option value="Basic">Basic</option>
+            </select>
+          </div>
         </div>
 
         {/* Save Button */}
@@ -233,7 +269,7 @@ export default function Profile() {
             saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'
           }`}
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? "Saving..." : "Save Changes"}
         </button>
 
         {/* Success Toast */}

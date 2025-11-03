@@ -4,11 +4,13 @@ const API_URL = 'http://localhost:8080';
 
 // Profile interface
 export interface UserProfile {
+  subscriptionPlan: string;
   id: string;
   name: string;
   email: string;
   phoneNumber?: string; 
   location?: string;
+  country?: string;
   profilePicture?: string;
   role?: string;
   bio?: string;
@@ -17,7 +19,7 @@ export interface UserProfile {
   totalReviews?: number;
   priceRangeMin?: number;
   priceRangeMax?: number;
-  password?: string; // Backend includes this but we don't display it
+  password?: string; 
   createdAt?: string;
   updatedAt?: string;
   paymentMethods?: string[];

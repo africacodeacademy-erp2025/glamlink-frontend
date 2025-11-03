@@ -58,10 +58,10 @@ export default function Navbar() {
           >
             <ul className="flex flex-col lg:flex-row max-lg:gap-4 mt-4 lg:mt-0 lg:space-x-8">
               {[
-                { name: 'Home', href: '#' },
-                { name: 'About Us', href: '#about-us' },
-                { name: 'Subscription Plans', href: '#plans' },
-                { name: "FAQ's", href: '#questions' },
+                { name: "Home", href: "#" },
+                { name: "About Us", href: "#about-us" },
+                { name: "Subscription Plans", href: "#plans" },
+                { name: "FAQ's", href: "#questions" },
               ].map((link) => (
                 <li key={link.name}>
                   <a

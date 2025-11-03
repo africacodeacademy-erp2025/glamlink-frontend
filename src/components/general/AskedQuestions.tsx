@@ -71,7 +71,9 @@ export default function FAQSection() {
                       <span>{faq.question}</span>
                       <ChevronDownIcon
                         className={`w-6 h-6 transform transition-transform duration-300 ${
-                          openIndex === index ? "rotate-180 text-indigo-600" : ""
+                          openIndex === index
+                            ? "rotate-180 text-indigo-600"
+                            : ""
                         }`}
                       />
                     </button>

@@ -8,7 +8,7 @@ export default function HeroSection() {
     <section className="relative flex items-center justify-center text-center px-6 py-24 h-[90vh] md:h-screen overflow-hidden">
       {/* Background Image */}
       <Image
-        src="/assets/bg.png"
+        src="/assets/Bg.png"
         alt="GlamLink Hero"
         fill
         priority
@@ -28,9 +28,10 @@ export default function HeroSection() {
         </h1>
 
         <p className="text-base md:text-lg text-gray-200 mb-10 leading-relaxed">
-          From Spas, Salons, and many other beauty services, we cater for all. 
-          Our WhatsApp-based booking tool streamlines appointments and payments, 
-          letting customers browse and choose from multiple providers in their area.
+          From Spas, Salons, and many other beauty services, we cater for all.
+          Our WhatsApp-based booking tool streamlines appointments and payments,
+          letting customers browse and choose from multiple providers in their
+          area.
         </p>
 
         {/* CTA Buttons */}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/app/api/auth";
+import { login } from "@/lib/api/auth";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -65,7 +65,9 @@ export default function LoginPage() {
         router.push("/dashboard");
       }, 1000);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }

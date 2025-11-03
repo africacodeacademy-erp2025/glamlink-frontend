@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 //import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Edit } from "lucide-react";
-import { Booking, BookingStatus } from "@/app/api/bookings";
+import { Booking, BookingStatus } from "@/lib/api/bookings";
 
 interface BookingCalendarProps {
   bookings: Booking[];
@@ -34,17 +34,26 @@ export default function BookingCalendar({
     if (booking.serviceId && serviceNames[booking.serviceId]) {
       return serviceNames[booking.serviceId];
     }
-    if (booking.service && typeof booking.service === 'object' && 'name' in booking.service) {
+    if (
+      booking.service &&
+      typeof booking.service === "object" &&
+      "name" in booking.service
+    ) {
       return booking.service.name;
     }
-    return 'Unknown Service';
+    return "Unknown Service";
   };
 
   const getStartTime = (booking: Booking): string => {
-    if (booking.slotId && slotTimes && typeof slotTimes === 'object' && slotTimes[booking.slotId]) {
+    if (
+      booking.slotId &&
+      slotTimes &&
+      typeof slotTimes === "object" &&
+      slotTimes[booking.slotId]
+    ) {
       return slotTimes[booking.slotId];
     }
-    return '';
+    return "";
   };
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -79,7 +88,8 @@ export default function BookingCalendar({
 
   const getBookingsForDate = (date: Date) => {
     return bookings.filter((b) => {
-      const bookingDateStr = getStartTime(b) || b.bookedAt || b.createdAt || b.updatedAt;
+      const bookingDateStr =
+        getStartTime(b) || b.bookedAt || b.createdAt || b.updatedAt;
       if (!bookingDateStr) return false;
       const bookingDate = new Date(bookingDateStr);
       return bookingDate.toDateString() === date.toDateString();
@@ -215,19 +225,34 @@ export default function BookingCalendar({
                               // Display in UTC to avoid timezone conversion
                               const hours = date.getUTCHours();
                               const minutes = date.getUTCMinutes();
-                              const ampm = hours >= 12 ? 'PM' : 'AM';
+                              const ampm = hours >= 12 ? "PM" : "AM";
                               const displayHours = hours % 12 || 12;
-                              return `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
+                              return `${String(displayHours).padStart(
+                                2,
+                                "0"
+                              )}:${String(minutes).padStart(2, "0")} ${ampm}`;
                             }
                           }
-                          return <span className="italic text-gray-400">Loading time...</span>;
+                          return (
+                            <span className="italic text-gray-400">
+                              Loading time...
+                            </span>
+                          );
                         })()}
                       </div>
                       <div className="truncate">
-                        {booking.customerName || booking.client_name || "Client"}
+                        {booking.customerName ||
+                          booking.client_name ||
+                          "Client"}
                       </div>
                       <div className="text-muted-foreground truncate">
-                        {getServiceName(booking) !== 'Unknown Service' ? getServiceName(booking) : <span className="italic text-gray-400">Loading service...</span>}
+                        {getServiceName(booking) !== "Unknown Service" ? (
+                          getServiceName(booking)
+                        ) : (
+                          <span className="italic text-gray-400">
+                            Loading service...
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}

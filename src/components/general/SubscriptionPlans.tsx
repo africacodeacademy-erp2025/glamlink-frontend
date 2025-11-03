@@ -34,12 +34,16 @@ const plans = [
 
 export default function SubscriptionPlans() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
   const router = useRouter();
 
   const handleSelect = (planName: string) => {
     setSelectedPlan(planName);
-    router.push(`/signup?plan=${encodeURIComponent(planName)}&billing=${billingCycle}`);
+    router.push(
+      `/signup?plan=${encodeURIComponent(planName)}&billing=${billingCycle}`
+    );
   };
 
   return (
@@ -47,7 +51,9 @@ export default function SubscriptionPlans() {
       id="plans"
       className="py-20 px-6 text-center bg-gradient-to-b from-gray-50 to-white"
     >
-      <h2 className="text-3xl md:text-4xl font-bold mb-6">Subscription Plans</h2>
+      <h2 className="text-3xl md:text-4xl font-bold mb-6">
+        Subscription Plans
+      </h2>
       <p className="text-gray-600 max-w-xl mx-auto mb-8">
         Choose the plan that fits your business needs. You can upgrade anytime.
       </p>
@@ -122,8 +128,8 @@ export default function SubscriptionPlans() {
                 {plan.name === "Free"
                   ? "Join Free"
                   : billingCycle === "monthly"
-                  ? "Upgrade Monthly"
-                  : "Upgrade Yearly"}
+                    ? "Upgrade Monthly"
+                    : "Upgrade Yearly"}
               </Button>
             </CardContent>
           </Card>

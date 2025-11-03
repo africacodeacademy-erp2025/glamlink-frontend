@@ -27,7 +27,12 @@ COPY components.json .
 
 # Environment variables for build time (add yours as needed)
 ARG NODE_ENV=production
+ARG NEXT_PUBLIC_BACKEND_URL
+ARG NEXT_PUBLIC_USE_PROXY=false
+
 ENV NODE_ENV=${NODE_ENV}
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+ENV NEXT_PUBLIC_USE_PROXY=${NEXT_PUBLIC_USE_PROXY}
 
 # Disable Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -51,6 +56,8 @@ RUN adduser --system --uid 1001 nextjs
 
 # Set environment
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+ENV NEXT_PUBLIC_USE_PROXY=${NEXT_PUBLIC_USE_PROXY}
 
 # Copy built application
 COPY --from=builder /app/public ./public
