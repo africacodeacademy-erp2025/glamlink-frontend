@@ -19,6 +19,23 @@ function SignUpForm() {
   // Plan selection
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
+  // Country detection
+  const [country, setCountry] = useState("");
+
+  // Detect user country
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        if (data?.country_name) setCountry(data.country_name);
+      } catch (err) {
+        console.error("Failed to detect country:", err);
+      }
+    };
+    detectCountry();
+  }, []);
+
   // Feedback & errors
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
@@ -89,7 +106,7 @@ function SignUpForm() {
         password,
         location,
         subscription_plan: selectedPlan || "Free",
-        country: "", // Provide a value or add a country field to the form if needed
+        country: country || "", // Use detected country
       });
       setIsSuccess(true);
       setTimeout(() => router.push("/login"), 1000);
