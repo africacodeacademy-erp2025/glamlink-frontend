@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { register } from "@/app/api/auth";
+import { register } from "@/lib/api/auth";
 import SubscriptionPlans from "@/components/general/SubscriptionPlans";
 
 function SignUpForm() {
@@ -18,6 +18,23 @@ function SignUpForm() {
 
   // Plan selection
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
+  // Country detection
+  const [country, setCountry] = useState("");
+
+  // Detect user country
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        if (data?.country_name) setCountry(data.country_name);
+      } catch (err) {
+        console.error("Failed to detect country:", err);
+      }
+    };
+    detectCountry();
+  }, []);
 
   // Feedback & errors
   const [error, setError] = useState("");
@@ -55,13 +72,17 @@ function SignUpForm() {
     const errors: { [key: string]: string } = {};
     if (!fullName.trim()) errors.fullName = "Full name is required.";
     if (!phone.trim()) errors.phone = "Phone number is required.";
-    else if (!/^[0-9]+$/.test(phone)) errors.phone = "Phone must contain only digits.";
+    else if (!/^[0-9]+$/.test(phone))
+      errors.phone = "Phone must contain only digits.";
     if (!email.trim()) errors.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email format.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      errors.email = "Invalid email format.";
     if (!location.trim()) errors.location = "Location is required.";
     if (!password) errors.password = "Password is required.";
-    else if (password.length < 10) errors.password = "Password must be at least 10 characters.";
-    if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match.";
+    else if (password.length < 10)
+      errors.password = "Password must be at least 10 characters.";
+    if (password !== confirmPassword)
+      errors.confirmPassword = "Passwords do not match.";
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -84,12 +105,15 @@ function SignUpForm() {
         phoneNumber: phone,
         password,
         location,
-        plan: selectedPlan || "Free",
+        subscription_plan: selectedPlan || "Free",
+        country: country || "", // Use detected country
       });
       setIsSuccess(true);
       setTimeout(() => router.push("/login"), 1000);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -122,12 +146,16 @@ function SignUpForm() {
               <p className="text-pink-200">Join GlamLink today!</p>
             </div>
 
-            <h1 className="text-3xl font-bold text-pink-600 mb-4">Create Account</h1>
+            <h1 className="text-3xl font-bold text-pink-600 mb-4">
+              Create Account
+            </h1>
 
             <div className="mb-4 p-3 border rounded-lg bg-pink-50 text-center w-full">
               <p className="text-sm text-gray-700">
                 Selected Plan:{" "}
-                <span className="font-semibold text-pink-600">{selectedPlan}</span>
+                <span className="font-semibold text-pink-600">
+                  {selectedPlan}
+                </span>
               </p>
               <button
                 onClick={() => setSelectedPlan(null)}
@@ -138,9 +166,16 @@ function SignUpForm() {
             </div>
 
             {error && <p className="text-red-500 mb-3 text-sm">{error}</p>}
-            {isSuccess && <p className="text-green-600 mb-3 text-sm">Account created! Redirecting...</p>}
+            {isSuccess && (
+              <p className="text-green-600 mb-3 text-sm">
+                Account created! Redirecting...
+              </p>
+            )}
 
-            <form className="w-full flex flex-col gap-3" onSubmit={handleSignUp}>
+            <form
+              className="w-full flex flex-col gap-3"
+              onSubmit={handleSignUp}
+            >
               <input
                 type="text"
                 placeholder="Full Name"
@@ -149,7 +184,9 @@ function SignUpForm() {
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.fullName && <p className="text-red-500 text-sm">{fieldErrors.fullName}</p>}
+              {fieldErrors.fullName && (
+                <p className="text-red-500 text-sm">{fieldErrors.fullName}</p>
+              )}
 
               <input
                 type="tel"
@@ -159,7 +196,9 @@ function SignUpForm() {
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.phone && <p className="text-red-500 text-sm">{fieldErrors.phone}</p>}
+              {fieldErrors.phone && (
+                <p className="text-red-500 text-sm">{fieldErrors.phone}</p>
+              )}
 
               <input
                 type="email"
@@ -169,7 +208,9 @@ function SignUpForm() {
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.email && <p className="text-red-500 text-sm">{fieldErrors.email}</p>}
+              {fieldErrors.email && (
+                <p className="text-red-500 text-sm">{fieldErrors.email}</p>
+              )}
 
               <input
                 type="text"
@@ -179,7 +220,9 @@ function SignUpForm() {
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.location && <p className="text-red-500 text-sm">{fieldErrors.location}</p>}
+              {fieldErrors.location && (
+                <p className="text-red-500 text-sm">{fieldErrors.location}</p>
+              )}
 
               <input
                 type="password"
@@ -189,7 +232,9 @@ function SignUpForm() {
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.password && <p className="text-red-500 text-sm">{fieldErrors.password}</p>}
+              {fieldErrors.password && (
+                <p className="text-red-500 text-sm">{fieldErrors.password}</p>
+              )}
 
               <input
                 type="password"
@@ -199,7 +244,11 @@ function SignUpForm() {
                 className="w-full mb-2 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
                 disabled={isLoading}
               />
-              {fieldErrors.confirmPassword && <p className="text-red-500 text-sm">{fieldErrors.confirmPassword}</p>}
+              {fieldErrors.confirmPassword && (
+                <p className="text-red-500 text-sm">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
 
               <button
                 type="submit"

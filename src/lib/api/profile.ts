@@ -20,8 +20,6 @@ export interface UserProfile {
   isActive?: boolean;
   rating?: number;
   totalReviews?: number;
-  priceRangeMin?: number;
-  priceRangeMax?: number;
   password?: string; // Backend includes this but we don't display it
   createdAt?: string;
   updatedAt?: string;

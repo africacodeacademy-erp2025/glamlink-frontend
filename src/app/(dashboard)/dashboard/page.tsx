@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getCurrentUser, getCurrentStylistId } from "@/app/api/auth";
+import { getCurrentUser, getCurrentStylistId } from "@/lib/api/auth";
 import { useBookings } from "@/hooks/use-bookings";
-import { useStylistsServices, useAllServices } from "@/hooks/use-stylists-service";
-import { getSlotById } from "@/app/api/timeslots";
+import {
+  useStylistsServices,
+  useAllServices,
+} from "@/hooks/use-stylists-service";
+import { getSlotById } from "@/lib/api/timeslots";
 import {
   Sparkles,
   Scissors,
@@ -79,7 +82,10 @@ export default function DashboardPage() {
               try {
                 const slot = await getSlotById(slotId);
                 slotTimeMap[slotId] =
-                  slot?.bookingTime || slot?.startTime || slot?.start_time || "";
+                  slot?.bookingTime ||
+                  slot?.startTime ||
+                  slot?.start_time ||
+                  "";
               } catch {
                 slotTimeMap[slotId] = "";
               }
@@ -109,9 +115,9 @@ export default function DashboardPage() {
             String(b.serviceId ?? b.service_id)
         );
         const mainServiceId = stylistService
-          ? (stylistService as any).serviceId ??
-            (stylistService as any).service_id
-          : b.serviceId ?? b.service_id;
+          ? ((stylistService as any).serviceId ??
+            (stylistService as any).service_id)
+          : (b.serviceId ?? b.service_id);
         const service = allServices.find(
           (s: any) => String(s.id) === String(mainServiceId)
         );
@@ -274,7 +280,7 @@ export default function DashboardPage() {
                 href="/services"
                 className="text-pink-500 hover:underline mt-2 inline-block"
               >
-                Add your first service 
+                Add your first service
               </Link>
             </div>
           ) : (
@@ -295,7 +301,8 @@ export default function DashboardPage() {
                     Service: {b.serviceDisplayName}
                   </p>
                   <p className="text-xs text-gray-400">
-                    Booking Date: {(b.slotDate || b.date || b.bookingDate || "").slice(0, 10)}
+                    Booking Date:{" "}
+                    {(b.slotDate || b.date || b.bookingDate || "").slice(0, 10)}
                   </p>
                 </div>
                 <div className="text-right">
@@ -317,8 +324,6 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-
-   
     </div>
   );
 }

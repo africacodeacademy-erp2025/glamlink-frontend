@@ -17,9 +17,7 @@ export interface RegisterData {
   password: string;
   location: string;
   country: string;
-  priceRangeMin: number;
-  priceRangeMax: number;
-  subscription_plan: string; 
+  subscription_plan: string;
 }
 
 export interface LoginData {
@@ -35,7 +33,7 @@ export const register = async (data: RegisterData) => {
     delete (payload as any).plan;
   }
   // Debug: log registration payload
-  console.log('Submitting registration:', payload);
+  console.log("Submitting registration:", payload);
   const res = await axios.post(`${API_URL}/auth/register`, payload);
   return res.data;
 };
