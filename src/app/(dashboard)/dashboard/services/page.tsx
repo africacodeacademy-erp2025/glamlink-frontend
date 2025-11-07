@@ -72,7 +72,9 @@ export default function ServicesPage() {
   const [categories, setCategories] = useState<string[]>(["All"]);
 
   const filteredAllServices = allServices.filter((s: Service) =>
-    selectedCategory === "All" ? true : ((s as any).category || "Uncategorized") === selectedCategory
+    selectedCategory === "All"
+      ? true
+      : ((s as any).category || "Uncategorized") === selectedCategory
   );
 
   // Greeting logic
@@ -105,7 +107,9 @@ export default function ServicesPage() {
       const processedServices = await Promise.all(
         Array.isArray(data)
           ? data.map(async (item: any) => {
-              const serviceDetails = await getServiceById(String(item.serviceId));
+              const serviceDetails = await getServiceById(
+                String(item.serviceId)
+              );
               return {
                 id: item.id,
                 name: serviceDetails.name,
@@ -125,12 +129,13 @@ export default function ServicesPage() {
       const all = await getServices();
       setAllServices(all as Service[]);
       const cats = Array.from(
-        new Set(["All", ...all.map((s: any) => (s.category || "Uncategorized"))])
+        new Set(["All", ...all.map((s: any) => s.category || "Uncategorized")])
       );
       setCategories(cats);
-    } catch (error) {
+    } catch (error: any) {
       setIsError(true);
       setServices([]);
+      setError("Error loading services. Please try refreshing the page.");
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +151,7 @@ export default function ServicesPage() {
 
   // Handle add service
   const handleAddService = async () => {
-  if (!serviceName || !price || !user || !category) return;
+    if (!serviceName || !price || !user || !category) return;
 
     try {
       setIsCreating(true);
@@ -161,14 +166,14 @@ export default function ServicesPage() {
 
       await createServiceAndAddToStylist(serviceData);
 
-  setServiceName("");
-  setPrice("");
-  setCategory("");
-  setDescription("");
+      setServiceName("");
+      setPrice("");
+      setCategory("");
+      setDescription("");
       setShowAddModal(false);
-      setMessage('Service added successfully!');
+      setMessage("Service added successfully!");
       await fetchServices();
-      setTimeout(() => setMessage(''), 3000);
+      setTimeout(() => setMessage(""), 3000);
     } catch (error: any) {
       setError("Failed to add service. Please try again.");
     } finally {
@@ -178,17 +183,17 @@ export default function ServicesPage() {
 
   // Handle edit service
   const handleEditService = (service: any) => {
-  setEditingService(service);
-  setEditServiceName(getServiceName(service));
-  setEditPrice(service.price?.toString() || "");
-  setEditCategory(service.category || "");
-  setEditDescription(service.description || "");
-  setShowEditModal(true);
+    setEditingService(service);
+    setEditServiceName(getServiceName(service));
+    setEditPrice(service.price?.toString() || "");
+    setEditCategory(service.category || "");
+    setEditDescription(service.description || "");
+    setShowEditModal(true);
   };
 
   // Handle update service
   const handleUpdateService = async () => {
-  if (!editServiceName || !editPrice || !user || !editingService) return;
+    if (!editServiceName || !editPrice || !user || !editingService) return;
 
     setIsUpdating(true);
     try {
@@ -203,18 +208,19 @@ export default function ServicesPage() {
         }
       );
 
-  setMessage('Service updated successfully!');
-  setTimeout(() => setMessage(''), 3000);
-  setShowEditModal(false);
-  setEditingService(null);
-  setEditServiceName("");
-  setEditPrice("");
-  setEditCategory("");
-  fetchServices(); // Refresh the list
+      setMessage("Service updated successfully!");
+      setTimeout(() => setMessage(""), 3000);
+      setShowEditModal(false);
+      setEditingService(null);
+      setEditServiceName("");
+      setEditPrice("");
+      setEditCategory("");
+      fetchServices(); // Refresh the list
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || "Unknown error";
-        setError(`Failed to update service: ${errorMessage}`);
+      setError(`Failed to update service`);
+      console.log(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -238,13 +244,14 @@ export default function ServicesPage() {
           await deleteStylistService(service.id);
         }
 
-      setMessage('Service deleted successfully!');
-      setTimeout(() => setMessage(''), 3000);
+        setMessage("Service deleted successfully!");
+        setTimeout(() => setMessage(""), 3000);
         fetchServices(); // Refresh the list
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || error.message || "Unknown error";
-          setError(`Failed to delete service: ${errorMessage}`);
+        setError(`Failed to delete service`);
+        console.log(errorMessage);
       }
     }
   };
@@ -261,7 +268,7 @@ export default function ServicesPage() {
   // Add an available service to the stylist
   const handleAddAvailableService = async (service: Service) => {
     if (!user) {
-  setError("Please log in to add services.");
+      setError("Please log in to add services.");
       return;
     }
 
@@ -271,8 +278,8 @@ export default function ServicesPage() {
         serviceId: String(service.id),
         price: service.price,
       });
-      setMessage('Service added to your list.');
-      setTimeout(() => setMessage(''), 3000);
+      setMessage("Service added to your list.");
+      setTimeout(() => setMessage(""), 3000);
       fetchServices();
     } catch (error: any) {
       setError("Failed to add service. Please try again.");
@@ -304,16 +311,21 @@ export default function ServicesPage() {
   }
 
   // Filter services by selected category (only backend)
-  const displayedServices = !selectedCategory || selectedCategory === "All"
-    ? filteredAllServices
-    : filteredAllServices.filter((s) => ((s as any).category || "Uncategorized") === selectedCategory);
+  const displayedServices =
+    !selectedCategory || selectedCategory === "All"
+      ? filteredAllServices
+      : filteredAllServices.filter(
+          (s) => ((s as any).category || "Uncategorized") === selectedCategory
+        );
 
   return (
     <div className="pb-16 p-4 relative">
-      {/* Success Message */}
-      {message && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <p>{message}</p>
+      {/* Bottom Toast for Success/Error */}
+      {(message || error) && (
+        <div
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+        >
+          {error || message}
         </div>
       )}
       {/* Greeting */}
@@ -357,24 +369,25 @@ export default function ServicesPage() {
                   onChange={(e) => setServiceName(e.target.value)}
                 />
               </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Category</label>
-                  <select
-                    className="w-full border p-2 rounded"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Hair Cut">Hair Cut</option>
-                    <option value="Nails">Nails</option>
-                    <option value="Makeup">Makeup</option>
-                    <option value="Hairstyles">Hairstyles</option>
-                    <option value="Massage">Massage</option>
-                    <option value="Other">Other</option>
-                  
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Category
+                </label>
+                <select
+                  className="w-full border p-2 rounded"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Hair Cut">Hair Cut</option>
+                  <option value="Nails">Nails</option>
+                  <option value="Makeup">Makeup</option>
+                  <option value="Hairstyles">Hairstyles</option>
+                  <option value="Massage">Massage</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Price</label>
                 <input
@@ -386,7 +399,9 @@ export default function ServicesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1">
+                  Description
+                </label>
                 <textarea
                   className="w-full border p-2 rounded"
                   placeholder="Enter description"
@@ -418,27 +433,30 @@ export default function ServicesPage() {
         </div>
       )}
 
-      {/* Error state for services */}
-      {isError && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          Error loading services. Please try refreshing the page.
-        </div>
-      )}
+      {/* Error state for services is now handled by the bottom toast */}
 
       {/* Services list (filterable) */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Your Services</CardTitle>
-          <CardDescription>Manage your services filtered by category</CardDescription>
+          <CardDescription>
+            Manage your services filtered by category
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-              <div className="flex items-center gap-3">
-              <label className="font-medium text-sm text-gray-700" htmlFor="your-services-category-filter">
+            <div className="flex items-center gap-3">
+              <label
+                className="font-medium text-sm text-gray-700"
+                htmlFor="your-services-category-filter"
+              >
                 Filter by category
               </label>
               <div id="your-services-category-filter" className="w-56">
-                <Select value={selectedCategory} onValueChange={(v: string) => setSelectedCategory(v)}>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={(v: string) => setSelectedCategory(v)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
@@ -449,7 +467,6 @@ export default function ServicesPage() {
                     <SelectItem value="Makeup">Makeup</SelectItem>
                     <SelectItem value="Hairstyles">Hairstyles</SelectItem>
                     <SelectItem value="Massage">Massage</SelectItem>
-                    
                   </SelectContent>
                 </Select>
               </div>
@@ -471,13 +488,18 @@ export default function ServicesPage() {
                   .filter((service) =>
                     selectedCategory === "All" || !selectedCategory
                       ? true
-                      : ((service as any).category || "Uncategorized") === selectedCategory
+                      : ((service as any).category || "Uncategorized") ===
+                        selectedCategory
                   )
                   .map((service) => (
                     <TableRow key={service.id}>
-                      <TableCell className="font-medium">{getServiceName(service)}</TableCell>
+                      <TableCell className="font-medium">
+                        {getServiceName(service)}
+                      </TableCell>
                       <TableCell>{service.description || ""}</TableCell>
-                      <TableCell>{(service as any).category || "Uncategorized"}</TableCell>
+                      <TableCell>
+                        {(service as any).category || "Uncategorized"}
+                      </TableCell>
                       <TableCell>P{getServicePrice(service)}</TableCell>
                       <TableCell className="flex gap-2">
                         <Button
@@ -508,7 +530,6 @@ export default function ServicesPage() {
           </div>
         </CardContent>
       </Card>
-
 
       {/* Edit Service Modal */}
       {showEditModal && (
@@ -547,7 +568,9 @@ export default function ServicesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
+                <label className="block text-sm font-medium mb-1">
+                  Category
+                </label>
                 <select
                   className="w-full border p-2 rounded"
                   value={editCategory}
@@ -562,7 +585,9 @@ export default function ServicesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1">
+                  Description
+                </label>
                 <textarea
                   className="w-full border p-2 rounded"
                   placeholder="Enter description"

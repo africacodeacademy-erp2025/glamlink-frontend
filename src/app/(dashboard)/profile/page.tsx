@@ -4,8 +4,8 @@ import {
   getUserProfileById,
   updateUserProfileById,
   uploadProfilePictureById,
-  UserProfile
-} from "@/app/api/profile";
+  UserProfile,
+} from "@/lib/api/profile";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
@@ -23,13 +23,11 @@ export default function Profile() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [location, setLocation] = useState(""); // user-entered
-  const [country, setCountry] = useState(""); // auto-detected, readonly
+  const [location, setLocation] = useState("");
+  const [country, setCountry] = useState("");
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [subscriptionPlan, setSubscriptionPlan] = useState("");
-  const countryList = ["Botswana", "Lesotho", "South Africa", "United States"];
-  const [country, setCountry] = useState("");
 
   // Set greeting
   useEffect(() => {
@@ -63,10 +61,11 @@ export default function Profile() {
   }, [user]);
 
   const fetchProfile = async () => {
-    if (!user?. id) return setError("User ID not available.");
+    if (!user?.id) return setError("User ID not available.");
     try {
       setLoading(true);
       const profileData = await getUserProfileById(user.id);
+      console.log("Profile data retrieved:", profileData);
       setProfile(profileData);
       setName(profileData.name || "");
       setEmail(profileData.email || "");
@@ -74,29 +73,38 @@ export default function Profile() {
       setLocation(profileData.location || "");
       setProfilePic(profileData.profilePicture || null);
       setPaymentMethods(profileData.paymentMethods || []);
+      setSubscriptionPlan(profileData.subscriptionPlan || "");
     } catch (err: any) {
-      setError(`Unable to load profile data: ${err.message}`);
+      setError(`Unable to load profile data`);
+      console.log(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePicChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (!user?.id) return setError("User ID not available.");
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) return setError("File size must be less than 5MB");
-      if (!file.type.startsWith("image/")) return setError("Please select a valid image file");
+      if (file.size > 5 * 1024 * 1024)
+        return setError("File size must be less than 5MB");
+      if (!file.type.startsWith("image/"))
+        return setError("Please select a valid image file");
 
       try {
         setUploading(true);
         const profilePictureUrl = await uploadProfilePictureById(user.id, file);
         setProfilePic(profilePictureUrl);
-        await updateUserProfileById(user.id, { profilePicture: profilePictureUrl });
+        await updateUserProfileById(user.id, {
+          profilePicture: profilePictureUrl,
+        });
         setMessage("Profile picture updated!");
         setTimeout(() => setMessage(""), 3000);
       } catch (err: any) {
-        setError(`Failed to upload: ${err.message}`);
+        setError(`Failed to upload profile picture`);
+        console.log(err.message);
       } finally {
         setUploading(false);
       }
@@ -107,7 +115,13 @@ export default function Profile() {
     if (!user?.id) return setError("User ID not available.");
     try {
       setSaving(true);
-      const updatedProfile = { name, email, phoneNumber, location, paymentMethods };
+      const updatedProfile = {
+        name,
+        email,
+        phoneNumber,
+        location,
+        paymentMethods,
+      };
       await updateUserProfileById(user.id, updatedProfile);
       setMessage("Profile updated successfully!");
       setShowModal(true);
@@ -116,7 +130,8 @@ export default function Profile() {
         setShowModal(false);
       }, 2000);
     } catch (err: any) {
-      setError(`Failed to save profile: ${err.message}`);
+      setMessage(`Failed to save profile`);
+      console.log(err.message);
     } finally {
       setSaving(false);
     }
@@ -137,7 +152,9 @@ export default function Profile() {
     <div className="pb-16 p-4 bg-gray-50 min-h-screen">
       {/* Greeting */}
       <div className="mb-6 p-6 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow text-white text-center">
-        <h2 className="text-2xl font-bold">{greeting} {name || 'User'}!</h2>
+        <h2 className="text-2xl font-bold">
+          {greeting} {name || "User"}!
+        </h2>
         <p className="mt-2 text-sm">Update your profile information below.</p>
       </div>
 
@@ -145,7 +162,12 @@ export default function Profile() {
       {error && (
         <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded shadow-md flex justify-between items-center">
           <span>{error}</span>
-          <button onClick={() => setError("")} className="text-sm font-semibold underline hover:no-underline">Dismiss</button>
+          <button
+            onClick={() => setError("")}
+            className="text-sm font-semibold underline hover:no-underline"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -158,11 +180,13 @@ export default function Profile() {
             alt="Profile"
             className="w-28 h-28 rounded-full object-cover border-4 border-pink-200 shadow-sm transition-all duration-300 group-hover:scale-105"
           />
-          <label className={`absolute bottom-0 right-0 bg-pink-500 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all duration-300 group-hover:bg-pink-600 ${uploading ? 'opacity-50' : ''}`}>
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
+          <label
+            className={`absolute bottom-0 right-0 bg-pink-500 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all duration-300 group-hover:bg-pink-600 ${uploading ? "opacity-50" : ""}`}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
               onChange={handleProfilePicChange}
               disabled={uploading}
             />
@@ -173,7 +197,9 @@ export default function Profile() {
         {/* Form Fields Grid */}
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Name
+            </label>
             <input
               type="text"
               value={name}
@@ -185,7 +211,9 @@ export default function Profile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -197,7 +225,9 @@ export default function Profile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Phone
+            </label>
             <input
               type="text"
               value={phoneNumber}
@@ -210,13 +240,19 @@ export default function Profile() {
 
           {/* Read-only Country */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Country</label>
-            <span className="inline-block w-full p-3 rounded-xl bg-gray-100 text-gray-700 cursor-not-allowed border">{country}</span>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Country
+            </label>
+            <span className="inline-block w-full p-3 rounded-xl bg-gray-100 text-gray-700 cursor-not-allowed border">
+              {country}
+            </span>
           </div>
 
           {/* User-entered Location */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-600 mb-1">Location</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Location
+            </label>
             <input
               type="text"
               value={location}
@@ -226,30 +262,14 @@ export default function Profile() {
               placeholder="Enter your location"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Country
-            </label>
-            <select
-              value={country}
-              onChange={e => setCountry(e.target.value)}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300"
-              disabled={saving}
-              required
-            >
-              <option value="">Select Country</option>
-              {countryList.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
+          {/* Country dropdown removed as requested */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Subscription Plan
             </label>
             <select
               value={subscriptionPlan}
-              onChange={e => setSubscriptionPlan(e.target.value)}
+              onChange={(e) => setSubscriptionPlan(e.target.value)}
               className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-300 font-semibold"
               disabled={saving}
               required
@@ -266,7 +286,9 @@ export default function Profile() {
           onClick={handleSave}
           disabled={saving}
           className={`mt-4 w-full py-3 rounded-2xl text-white font-semibold text-lg transition ${
-            saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'
+            saving
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-pink-500 hover:bg-pink-600"
           }`}
         >
           {saving ? "Saving..." : "Save Changes"}
