@@ -17,11 +17,7 @@ export default function LoginPage() {
   const [greeting, setGreeting] = useState("Welcome!");
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
-    "/assets/image.png",
-    "/assets/imae.png",
-    "/assets/i.png",
-  ];
+  const slides = ["/assets/image.png", "/assets/imae.png", "/assets/i.png"];
 
   // Redirect if logged in
   useEffect(() => {
@@ -65,9 +61,8 @@ export default function LoginPage() {
         router.push("/dashboard");
       }, 1000);
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      setError("Login failed. Please try again.");
+      console.log(err.response?.data?.message);
     } finally {
       setIsLoading(false);
     }
