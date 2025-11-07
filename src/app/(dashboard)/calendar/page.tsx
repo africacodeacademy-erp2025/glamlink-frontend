@@ -136,7 +136,7 @@ export default function Page() {
           startTime: isoStart,
           endTime: isoEnd,
         });
-        setMessage('Time slot updated successfully!');
+        setMessage("Time slot updated successfully!");
       } else {
         // Create new slot
         const slotData = {
@@ -207,22 +207,12 @@ export default function Page() {
       </p>
 
       {/* Error Message */}
-      {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p>{error}</p>
-          <button
-            onClick={() => setError("")}
-            className="mt-2 text-sm underline hover:no-underline"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {message && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <p>{message}</p>
+      {/* Bottom Toast for Success/Error */}
+      {(message || error) && (
+        <div
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+        >
+          {error || message}
         </div>
       )}
       <FullCalendar
@@ -232,7 +222,9 @@ export default function Page() {
         headerToolbar={{
           left: "prev,next today",
           center: "title",
-          right: isMobile ? "timeGridDay" : "dayGridMonth,timeGridWeek,timeGridDay",
+          right: isMobile
+            ? "timeGridDay"
+            : "dayGridMonth,timeGridWeek,timeGridDay",
         }}
         selectable={true}
         select={isMobile ? undefined : handleDateSelect}
@@ -347,7 +339,13 @@ export default function Page() {
                 }`}
                 disabled={isLoading}
               >
-                {isLoading ? (editMode ? "Updating..." : "Adding...") : (editMode ? "Update" : "Add")}
+                {isLoading
+                  ? editMode
+                    ? "Updating..."
+                    : "Adding..."
+                  : editMode
+                    ? "Update"
+                    : "Add"}
               </button>
             </div>
           </form>

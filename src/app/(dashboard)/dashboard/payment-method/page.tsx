@@ -180,6 +180,14 @@ export default function PaymentMethodPage() {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-50 pb-20 p-4">
+      {/* Bottom Toast for Booking Fee and Payment Method Success/Error */}
+      {(feeError || success || error || paymentSuccess) && (
+        <div
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${feeError || error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+        >
+          {feeError || error || success || paymentSuccess}
+        </div>
+      )}
       <div className="bg-pink-500 text-white p-10 rounded-2xl shadow mb-6 text-center w-full">
         <p className="mt-2 text-lg">
           {user?.name ? <>Welcome back, {user.name} 👋</> : <span>&nbsp;</span>}
@@ -194,8 +202,6 @@ export default function PaymentMethodPage() {
           <h2 className="text-lg font-bold mb-4">Your Booking Fee</h2>
           {feeLoading ? (
             <p>Loading...</p>
-          ) : feeError && user?.id ? (
-            <p className="text-red-600 mb-2">Could not load booking fee.</p>
           ) : bookingFee === null && user?.id ? (
             <p className="text-gray-600 mb-2">No booking fee found.</p>
           ) : (
@@ -272,8 +278,7 @@ export default function PaymentMethodPage() {
             >
               {feeLoading ? "Saving..." : "Save Booking Fee"}
             </button>
-            {success && <p className="text-green-600 mt-2">{success}</p>}
-            {feeError && <p className="text-red-600 mt-2">{feeError}</p>}
+            {/* Success/Error handled by bottom toast */}
           </form>
         )}
 
@@ -281,7 +286,7 @@ export default function PaymentMethodPage() {
           <h2 className="text-lg font-bold mb-4">
             Payment Methods Linked to You
           </h2>
-          {error && <p className="text-red-600 mb-2">{error}</p>}
+          {/* Error handled by bottom toast */}
           {methodsLoading ? (
             <p>Loading...</p>
           ) : stylistMethods.length === 0 ? (
@@ -394,10 +399,6 @@ export default function PaymentMethodPage() {
           >
             {loading ? "Saving..." : "Add Payment Method"}
           </button>
-          {paymentSuccess && (
-            <p className="text-green-600 mt-2">{paymentSuccess}</p>
-          )}
-          {error && <p className="text-red-600 mt-2">{error}</p>}
         </form>
       </div>
     </div>

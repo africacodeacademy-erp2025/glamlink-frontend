@@ -88,21 +88,20 @@ export const uploadProfilePictureById = async (
   file: File
 ): Promise<string> => {
   const formData = new FormData();
-  formData.append("profilePicture", file);
+  formData.append("file", file);
 
   try {
-    // Use only the working providers endpoint
-    const response = await apiClient.post(
-      `/providers/${userId}/upload-picture`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    return response.data.profilePictureUrl;
+    // Always use the direct Next.js API route
+    const response = await fetch("/api/upload-profile-pic", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => null);
+      throw new Error(err?.error || `Upload failed: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.url;
   } catch (error: any) {
     if (error.response?.status === 401) {
       throw new Error("Unauthorized: Please log in again");
