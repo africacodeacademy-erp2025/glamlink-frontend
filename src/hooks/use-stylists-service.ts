@@ -5,16 +5,17 @@ import {
   getServicesForStylist,
   getServices,
   getServiceById,
-  removeServiceFromStylist
-} from "@/app/api/stylists-service";
-
+  removeServiceFromStylist,
+} from "@/lib/api/stylists-service";
 
 export function useCreateService() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: addServiceToStylist,
     onSuccess: (_, variables) => {
-      qc.invalidateQueries({ queryKey: ["stylistServices", variables.stylistId] });
+      qc.invalidateQueries({
+        queryKey: ["stylistServices", variables.stylistId],
+      });
     },
   });
 }
@@ -33,10 +34,17 @@ export function useService(id: string) {
 export function useRemoveServiceFromStylist() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ stylistId, serviceId }: { stylistId: string; serviceId: string }) =>
-      removeServiceFromStylist(stylistId, serviceId),
+    mutationFn: ({
+      stylistId,
+      serviceId,
+    }: {
+      stylistId: string;
+      serviceId: string;
+    }) => removeServiceFromStylist(stylistId, serviceId),
     onSuccess: (_, variables) => {
-      qc.invalidateQueries({ queryKey: ["stylistServices", variables.stylistId] });
+      qc.invalidateQueries({
+        queryKey: ["stylistServices", variables.stylistId],
+      });
     },
   });
 }
@@ -46,4 +54,3 @@ export function useAllServices() {
     queryFn: getServices,
   });
 }
-

@@ -1,23 +1,9 @@
-import axios from "axios";
+/**
+ * Stylists Service API
+ * Handles service and stylist-service operations
+ */
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080" as string;
-
-// Create axios instance with automatic auth headers
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add auth token to requests automatically
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import apiClient from "./client";
 
 // TypeScript interfaces
 export interface Service {
@@ -38,7 +24,7 @@ export const addServiceToStylist = async (data: {
     stylistId: data.stylistId,
     serviceId: data.serviceId,
     price: data.price,
-    duration: data.duration
+    duration: data.duration,
   });
   return res.data;
 };
@@ -50,13 +36,16 @@ export const getServices = async (): Promise<Service[]> => {
 };
 
 // Get services for a specific stylist from database
-export const getServicesForStylist = async (stylistId: string): Promise<Service[]> => {
+export const getServicesForStylist = async (
+  stylistId: string
+): Promise<Service[]> => {
   const res = await apiClient.get(`/stylist-services?stylist_id=${stylistId}`);
   // Filter on frontend to ensure we only get the correct stylist's services
-  const filteredData = Array.isArray(res.data) 
-    ? res.data.filter((item: any) => 
-        String(item.stylistId) === stylistId || 
-        String(item.stylist_id) === stylistId
+  const filteredData = Array.isArray(res.data)
+    ? res.data.filter(
+        (item: any) =>
+          String(item.stylistId) === stylistId ||
+          String(item.stylist_id) === stylistId
       )
     : [];
   return filteredData;
@@ -67,6 +56,7 @@ export const getServiceById = async (id: string): Promise<Service> => {
   const res = await apiClient.get(`/services/${id}`);
   return res.data;
 };
+
 // Fetch service names for given service IDs
 export const fetchServiceNames = async (
   serviceIds: string[],
@@ -86,29 +76,47 @@ export const fetchServiceNames = async (
     });
     setServiceNames(newServiceNames);
   } catch (error) {
-    console.error('Failed to fetch service names', error);
+    console.error("Failed to fetch service names", error);
   }
 };
 
 // Update service in database
-export const updateService = async (id: string, data: { name?: string; description?: string; price?: number }): Promise<Service> => {
+export const updateService = async (
+  id: string,
+  data: { name?: string; description?: string; price?: number }
+): Promise<Service> => {
   const res = await apiClient.put(`/stylist-services/${id}`, data);
   return res.data;
 };
 
 // Update stylist service (price, duration, etc.)
-export const updateStylistService = async (id: string, data: { serviceId?: string; price?: number; duration?: number }) => {
+export const updateStylistService = async (
+  id: string,
+  data: { serviceId?: string; price?: number; duration?: number }
+) => {
   const res = await apiClient.put(`/stylist-services/${id}`, data);
   return res.data;
 };
 
+// Update service category
+export const updateServiceCategory = async (
+  serviceId: string,
+  category: string
+) => {
+  const res = await apiClient.put(`/services/${serviceId}`, { category });
+  return res.data;
+};
+
 // Delete service from stylist
-export const removeServiceFromStylist = async (stylistId: string, serviceId: string) => {
+export const removeServiceFromStylist = async (
+  stylistId: string,
+  serviceId: string
+) => {
   const res = await apiClient.delete(`/stylist-services`, {
-    data: { 
+    data: {
       stylistId: stylistId,
-      serviceId: serviceId
-    }
+      serviceId: serviceId,
+    },
   });
   return res.data;
 };
@@ -125,6 +133,7 @@ export const createServiceAndAddToStylist = async (data: {
   serviceName: string;
   price: number;
   description?: string;
+  category?: string;
 }) => {
   try {
     // First, check if the service already exists
@@ -132,14 +141,16 @@ export const createServiceAndAddToStylist = async (data: {
     try {
       const allServicesRes = await apiClient.get(`/services`);
       const existingService = Array.isArray(allServicesRes.data)
-        ? allServicesRes.data.find((s: any) => s.name.toLowerCase() === data.serviceName.toLowerCase())
+        ? allServicesRes.data.find(
+            (s: any) => s.name.toLowerCase() === data.serviceName.toLowerCase()
+          )
         : null;
       if (existingService) {
         existingServiceId = existingService.id;
       }
     } catch (fetchErr) {
       // If fetching services fails, log but continue to try creating
-      console.error('Error fetching services:', fetchErr);
+      console.error("Error fetching services:", fetchErr);
     }
 
     let serviceIdToUse = existingServiceId;
@@ -148,6 +159,7 @@ export const createServiceAndAddToStylist = async (data: {
       const serviceRes = await apiClient.post(`/services`, {
         name: data.serviceName,
         description: data.description || `${data.serviceName} service`,
+        category: data.category,
       });
       serviceIdToUse = serviceRes.data.id;
     }
@@ -162,45 +174,57 @@ export const createServiceAndAddToStylist = async (data: {
   } catch (error) {
     const err = error as any;
     if (err.response && err.response.data) {
-      console.error('Service creation error:', err.response.data);
+      console.error("Service creation error:", err.response.data);
     } else if (err.message) {
-      console.error('Service creation error:', err.message);
+      console.error("Service creation error:", err.message);
     } else {
-      console.error('Service creation error:', err);
+      console.error("Service creation error:", err);
     }
     throw error;
   }
 };
 
 // Update both service name and stylist service data
-export const updateStylistServiceWithName = async (stylistServiceId: string, serviceId: string, data: {
-  serviceName?: string;
-  price?: number;
-  duration?: number;
-}) => {
+export const updateStylistServiceWithName = async (
+  stylistServiceId: string,
+  serviceId: string,
+  data: {
+    serviceName?: string;
+    price?: number;
+    duration?: number;
+    category?: string;      // add this
+    description?: string;   // add this
+  }
+) => {
   try {
     // If service name needs to be updated, update the service record
     if (data.serviceName && serviceId) {
-      await apiClient.put(`/services/${serviceId}`, {
-        name: data.serviceName
-      });
+      const updatePayload = {
+        name: data.serviceName,
+        category: data.category,
+        description: data.description,
+        price: data.price
+      };
+      console.log('[DEBUG] Updating service:', serviceId, updatePayload);
+      await apiClient.put(`/services/${serviceId}`, updatePayload);
     }
-    
+
     // Update the stylist service record (price, duration)
     const updateData: any = {};
     if (data.price !== undefined) updateData.price = data.price;
     if (data.duration !== undefined) updateData.duration = data.duration;
-    
+
     if (Object.keys(updateData).length > 0) {
-      const res = await apiClient.put(`/stylist-services/${stylistServiceId}`, updateData);
+      const res = await apiClient.put(
+        `/stylist-services/${stylistServiceId}`,
+        updateData
+      );
       return res.data;
     }
-    
+
     return { success: true };
   } catch (error) {
-    console.error('Error updating stylist service with name:', error);
+    console.error("Error updating stylist service with name:", error);
     throw error;
   }
 };
-
-

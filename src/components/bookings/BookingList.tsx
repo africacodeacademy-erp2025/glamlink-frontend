@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2, Send } from "lucide-react";
-import { Booking, BookingStatus } from "@/app/api/bookings";
+import { Booking, BookingStatus } from "@/lib/api/bookings";
 
 interface BookingListProps {
   bookings?: Booking[];
@@ -66,57 +66,72 @@ export default function BookingList(props: BookingListProps) {
     if (booking.serviceId && serviceNames[booking.serviceId]) {
       return serviceNames[booking.serviceId];
     }
-    if (booking.service && typeof booking.service === 'object' && 'name' in booking.service) {
+    if (
+      booking.service &&
+      typeof booking.service === "object" &&
+      "name" in booking.service
+    ) {
       return booking.service.name;
     }
-    return 'Unknown Service';
+    return "Unknown Service";
   };
 
   const getStartTime = (booking: Booking): string => {
-    if (booking.slotId && slotTimes && typeof slotTimes === 'object' && slotTimes[booking.slotId]) {
+    if (
+      booking.slotId &&
+      slotTimes &&
+      typeof slotTimes === "object" &&
+      slotTimes[booking.slotId]
+    ) {
       return slotTimes[booking.slotId];
     }
-    return '';
+    return "";
   };
 
   const formatBookingDate = (booking: Booking): string => {
-    const slotDateStr = getStartTime(booking) || booking.bookedAt || booking.createdAt || booking.updatedAt;
+    const slotDateStr =
+      getStartTime(booking) ||
+      booking.bookedAt ||
+      booking.createdAt ||
+      booking.updatedAt;
     if (slotDateStr) {
       const date = new Date(slotDateStr);
       if (!isNaN(date.getTime())) {
-        return date.toLocaleString('en-US');
+        return date.toLocaleString("en-US");
       }
     }
-    return '';
+    return "";
   };
 
   const formatBookingTime = (booking: Booking): string => {
     const startTime = getStartTime(booking);
-    if (startTime === 'Unknown Time') {
-      return 'Time TBD';
+    if (startTime === "Unknown Time") {
+      return "Time TBD";
     }
     const date = new Date(startTime);
     if (!isNaN(date.getTime())) {
       // Display in UTC to match the stored time
       const hours = date.getUTCHours();
       const minutes = date.getUTCMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const ampm = hours >= 12 ? "PM" : "AM";
       const displayHours = hours % 12 || 12;
-      return `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
+      return `${String(displayHours).padStart(2, "0")}:${String(
+        minutes
+      ).padStart(2, "0")} ${ampm}`;
     }
-    return '';
+    return "";
   };
 
   const formatStartTime = (booking: Booking): string => {
     const startTime = getStartTime(booking);
-    if (startTime === 'Unknown Time') {
-      return 'Unknown Time';
+    if (startTime === "Unknown Time") {
+      return "Unknown Time";
     }
     const date = new Date(startTime);
     if (!isNaN(date.getTime())) {
-      return date.toLocaleString('en-US');
+      return date.toLocaleString("en-US");
     }
-    return '';
+    return "";
   };
 
   const filteredBookings = useMemo(() => {
@@ -155,7 +170,10 @@ export default function BookingList(props: BookingListProps) {
         label: "Pending",
       },
     };
-    const config = statusConfig[status] || { variant: "secondary", label: status };
+    const config = statusConfig[status] || {
+      variant: "secondary",
+      label: status,
+    };
     return <Badge variant={config.variant as any}>{config.label}</Badge>;
   };
 
@@ -194,7 +212,9 @@ export default function BookingList(props: BookingListProps) {
             <Input
               placeholder="Search customer or service..."
               value={filters.search}
-              onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
             />
           </div>
         </div>
@@ -221,31 +241,43 @@ export default function BookingList(props: BookingListProps) {
                     <div className="font-medium">
                       {/* Show date and time only once, formatted as 'YYYY-MM-DD HH:mm' */}
                       {(() => {
-                        const slotDateStr = getStartTime(booking) || booking.bookedAt || booking.createdAt || booking.updatedAt;
+                        const slotDateStr =
+                          getStartTime(booking) ||
+                          booking.bookedAt ||
+                          booking.createdAt ||
+                          booking.updatedAt;
                         if (slotDateStr) {
                           const date = new Date(slotDateStr);
                           if (!isNaN(date.getTime())) {
                             return (
-                              date.toLocaleString('en-US', {
-                                timeZone: 'UTC',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                              }) + ' UTC'
+                              date.toLocaleString("en-US", {
+                                timeZone: "UTC",
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }) + " UTC"
                             );
                           }
                         }
-                        return <span className="italic text-gray-400">Loading date...</span>;
+                        return (
+                          <span className="italic text-gray-400">
+                            Loading date...
+                          </span>
+                        );
                       })()}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {getServiceName(booking) !== 'Unknown Service'
-                      ? getServiceName(booking)
-                      : <span className="italic text-gray-400">Loading service...</span>}
+                    {getServiceName(booking) !== "Unknown Service" ? (
+                      getServiceName(booking)
+                    ) : (
+                      <span className="italic text-gray-400">
+                        Loading service...
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell>{getStatusBadge(booking.status)}</TableCell>
                   <TableCell>
@@ -254,7 +286,11 @@ export default function BookingList(props: BookingListProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => onConfirm(booking.id)}
-                        disabled={booking.status === BookingStatus.CONFIRMED || booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.RESCHEDULED}
+                        disabled={
+                          booking.status === BookingStatus.CONFIRMED ||
+                          booking.status === BookingStatus.COMPLETED ||
+                          booking.status === BookingStatus.RESCHEDULED
+                        }
                       >
                         Confirm
                       </Button>
@@ -262,7 +298,10 @@ export default function BookingList(props: BookingListProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => onReschedule(booking)}
-                        disabled={booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.RESCHEDULED}
+                        disabled={
+                          booking.status === BookingStatus.COMPLETED ||
+                          booking.status === BookingStatus.RESCHEDULED
+                        }
                       >
                         Reschedule
                       </Button>
@@ -270,7 +309,10 @@ export default function BookingList(props: BookingListProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => onCancel(booking.id)}
-                        disabled={booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.CANCELLED}
+                        disabled={
+                          booking.status === BookingStatus.COMPLETED ||
+                          booking.status === BookingStatus.CANCELLED
+                        }
                         className="text-destructive"
                       >
                         Cancel
@@ -279,7 +321,11 @@ export default function BookingList(props: BookingListProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => onComplete(booking.id)}
-                        disabled={booking.status === BookingStatus.COMPLETED || (booking.status !== BookingStatus.CONFIRMED && booking.status !== BookingStatus.RESCHEDULED)}
+                        disabled={
+                          booking.status === BookingStatus.COMPLETED ||
+                          (booking.status !== BookingStatus.CONFIRMED &&
+                            booking.status !== BookingStatus.RESCHEDULED)
+                        }
                       >
                         Complete
                       </Button>

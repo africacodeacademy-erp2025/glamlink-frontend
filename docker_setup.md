@@ -305,7 +305,6 @@ NEXT_PUBLIC_FIREBASE_PHONE_TESTING=true
    ```
 
 2. **Access the application:**
-
    - Main app: http://localhost:3000
    - Hot reload is enabled through volume mounts
 

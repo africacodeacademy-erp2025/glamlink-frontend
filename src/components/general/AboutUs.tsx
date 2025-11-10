@@ -1,5 +1,5 @@
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import { FaWhatsapp } from "react-icons/fa"; 
+import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 
 export default function AboutUs() {
@@ -7,7 +7,6 @@ export default function AboutUs() {
     <section className="py-24 relative" id="about-us">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-
           {/* Left side images */}
           <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 lg:order-first order-last">
             <div className="pt-24 flex justify-start sm:justify-end">
@@ -35,25 +34,39 @@ export default function AboutUs() {
                 Why Choose <span className="text-pink-600">GlamLink?</span>
               </h2>
               <p className="text-gray-600 text-lg leading-relaxed">
-                GlamLink connects beauty service providers with customers seamlessly. 
-                Manage appointments, view services, and grow your business effortlessly. 
-                Perfect for independent stylists or full-scale salons.
+                GlamLink connects beauty service providers with customers
+                seamlessly. Manage appointments, view services, and grow your
+                business effortlessly. Perfect for independent stylists or
+                full-scale salons.
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid sm:grid-cols-3 grid-cols-1 gap-6 w-full">
               <div className="flex flex-col gap-2">
-                <h3 className="text-pink-600 font-semibold text-xl">Easy Bookings</h3>
-                <p className="text-gray-600 text-base">Confirm client appointments quickly and efficiently.</p>
+                <h3 className="text-pink-600 font-semibold text-xl">
+                  Easy Bookings
+                </h3>
+                <p className="text-gray-600 text-base">
+                  Confirm client appointments quickly and efficiently.
+                </p>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-pink-600 font-semibold text-xl">Smart Dashboard</h3>
-                <p className="text-gray-600 text-base">Track services, bookings, and client activity at a glance.</p>
+                <h3 className="text-pink-600 font-semibold text-xl">
+                  Smart Dashboard
+                </h3>
+                <p className="text-gray-600 text-base">
+                  Track services, bookings, and client activity at a glance.
+                </p>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-pink-600 font-semibold text-xl">Stay Connected</h3>
-                <p className="text-gray-600 text-base">Chat with clients directly via WhatsApp for seamless communication.</p>
+                <h3 className="text-pink-600 font-semibold text-xl">
+                  Stay Connected
+                </h3>
+                <p className="text-gray-600 text-base">
+                  Chat with clients directly via WhatsApp for seamless
+                  communication.
+                </p>
               </div>
             </div>
 
@@ -79,7 +92,6 @@ export default function AboutUs() {
               </a>
             </div>
           </div>
-
         </div>
       </div>
     </section>

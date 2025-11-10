@@ -2,13 +2,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  register,
-  login,
-  RegisterData,
-  LoginData,
-} from "@/app/api/auth";
-
+import { register, login, RegisterData, LoginData } from "@/lib/api/auth";
 
 export function useRegister() {
   const qc = useQueryClient();

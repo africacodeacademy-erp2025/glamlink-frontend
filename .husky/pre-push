@@ -1,0 +1,35 @@
+#!/bin/sh
+# Pre-push hook - runs before pushing to remote repository
+# This ensures code quality and prevents broken code from being pushed
+
+echo "🔍 Running pre-push checks..."
+echo ""
+
+# 1. Run TypeScript type checking
+echo "📝 Type checking..."
+npm run type-check
+if [ $? -ne 0 ]; then
+  echo "❌ Type check failed. Fix errors before pushing."
+  exit 1
+fi
+
+# 2. Check code formatting
+echo "✨ Checking code formatting..."
+npm run format:check
+if [ $? -ne 0 ]; then
+  echo "❌ Code formatting check failed. Run 'npm run format' to fix."
+  exit 1
+fi
+
+# 3. Try to build (optional but recommended)
+echo "🏗️  Building project..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed. Fix build errors before pushing."
+  exit 1
+fi
+
+echo ""
+echo "✅ All pre-push checks passed!"
+echo "🚀 Pushing to remote..."
+
