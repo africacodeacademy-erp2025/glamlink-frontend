@@ -121,6 +121,7 @@ export default function Profile() {
         phoneNumber,
         location,
         paymentMethods,
+        subscriptionPlan,
       };
       await updateUserProfileById(user.id, updatedProfile);
       setMessage("Profile updated successfully!");
