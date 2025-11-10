@@ -18,9 +18,11 @@ export default function Tour() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // For the preview, we want the tour to be open by default.
-    // In the real implementation, this would be controlled by localStorage.
-    setOpen(true);
+    const tourCompleted = localStorage.getItem('glamlinkTourCompleted');
+    if (!tourCompleted) {
+      setOpen(true);
+      localStorage.setItem('glamlinkTourCompleted', 'true');
+    }
   }, []);
 
   const steps = [
