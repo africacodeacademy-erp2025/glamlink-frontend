@@ -5,6 +5,7 @@ import { getCurrentUser, getCurrentStylistId } from "@/app/api/auth";
 import { useBookings } from "@/hooks/use-bookings";
 import { useStylistsServices, useAllServices } from "@/hooks/use-stylists-service";
 import { getSlotById } from "@/app/api/timeslots";
+import Tour from '@/components/ui/ruixen-tour';
 
 export default function DashboardPage() {
   const [providerName, setProviderName] = useState<string>("");
@@ -124,6 +125,7 @@ export default function DashboardPage() {
   });
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-50 pb-20 p-4">
+      <Tour />
       <div className="bg-pink-500 text-white p-10 rounded-2xl shadow mb-6 text-center w-full">
         <p className="mt-2 text-lg">
           {isClient ? <>Welcome back, {providerName} 👋</> : <span>&nbsp;</span>}

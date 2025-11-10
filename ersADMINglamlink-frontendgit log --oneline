@@ -1,0 +1,31 @@
+[33m0e97774[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtour-component[m[33m)[m The tour component provides a brief overview of the application's features and is styled to match our application's existing ui design.
+[33mb902e0c[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m, [m[1;32mfeature-branch[m[33m)[m fix: resolve hydration error in login page greeting
+[33mb652254[m fix: correct timezone handling for time slot creation - preserve selected time without conversion
+[33m1190757[m chore: remove duplicate bookings page
+[33maaf3d4e[m fix: use slot start_time instead of bookedAt for Today's Bookings and fix timezone display issues
+[33m13b2c5e[m fix: resolve timezone inconsistency between webapp and chatbot
+[33m16b1938[m fix: add suspense to the useSearchParams function
+[33mf9fa415[m chore: update the docker compose file to run prod by default
+[33m72a0722[m chore: update the docker compose file to run prod by default
+[33m9a0cb3a[m chore: exclude next-env.d.ts from Docker builds
+[33m1da3289[m updated code for proper variables
+[33mb8c111d[m Updated port number
+[33m3bbc08e[m fixed booking status
+[33ma0183c8[m Merge remote changes, accepting remote signup page
+[33m94c5d41[m feat: Add Docker support with production and development configurations
+[33m21c227e[m Update signup and subscription plans, fix UI components
+[33m37fd984[m fix: prevent duplicate service creation and improve error logging
+[33m0afc3fe[m changed the background color for calender to pink
+[33meec0369[m Refactor booking list filters: remove date filter, keep status and customer/service search, changed background color for cards to pink
+[33mb3fec65[m Refactor: Improve booking and service data handling across dashboard
+[33mbdebaeb[m Updated to refresh after booking status changes and after slot creation
+[33md7df8f3[m Updated the code to use string types instead of number
+[33m90475f7[m Subscription plans page
+[33m14cf837[m added payments methods page, updated profile
+[33m8bcee84[m Improved booking status button logic and UI in dashboard - Updated sidebar navigation and layout components
+[33m7135424[m Display booking start time using slot details
+[33m00d419e[m commit
+[33ma4ab787[m  fix(sidebar): remove notification badge from Services menu item
+[33m5eabaff[m  feat(calendar): allow users to set available hours for selected days via modal
+[33m8b71f7c[m initial commit
+[33m1fe5d70[m Initial commit from Create Next App
