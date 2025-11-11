@@ -27,10 +27,10 @@ export default function DashboardPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    "/assets/imae.png",
-    "/assets/image.png",
-    "/assets/Glam-Link.png",
-    "/assets/i.png",
+    "/assets/banner-1.png",
+    "/assets/banner-2.png",
+    "/assets/banner-3.png",
+    "/assets/banner-4.png",
   ];
 
   const slogans = [
