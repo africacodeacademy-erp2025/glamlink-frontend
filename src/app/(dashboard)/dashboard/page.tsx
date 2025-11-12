@@ -27,10 +27,10 @@ export default function DashboardPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    "/assets/q.png",
-    "/assets/image.png",
-    "/assets/Glam-Link.png",
-    "/assets/i.png",
+    "/assets/banner-1.png",
+    "/assets/banner-2.png",
+    "/assets/banner-3.png",
+    "/assets/banner-4.png",
   ];
 
   const slogans = [
@@ -268,16 +268,9 @@ export default function DashboardPage() {
             <p>Loading...</p>
           ) : previousBookings.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <Image
-                src="/assets/empty-bookings.svg"
-                width={100}
-                height={100}
-                alt="No bookings"
-                className="mx-auto mb-3 opacity-80"
-              />
               <p>No previous bookings found.</p>
               <Link
-                href="/services"
+                href="dashboard/services"
                 className="text-pink-500 hover:underline mt-2 inline-block"
               >
                 Add your first service
