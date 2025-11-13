@@ -346,7 +346,7 @@ export default function ServicesPage() {
         </button>
 
         {showAddModal && (
-          <div className="max-w-md bg-white rounded-lg shadow p-6">
+          <div className="w-full bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4 text-pink-600">
               Add Service
             </h2>
@@ -400,7 +400,8 @@ export default function ServicesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Description
+                  Description{" "}
+                  <span className="text-xs text-gray-500">(optional)</span>
                 </label>
                 <textarea
                   className="w-full border p-2 rounded"
@@ -586,7 +587,8 @@ export default function ServicesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Description
+                  Description{" "}
+                  <span className="text-xs text-gray-500">(optional)</span>
                 </label>
                 <textarea
                   className="w-full border p-2 rounded"
