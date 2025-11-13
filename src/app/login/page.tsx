@@ -17,7 +17,11 @@ export default function LoginPage() {
   const [greeting, setGreeting] = useState("Welcome!");
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = ["/assets/image.png", "/assets/imae.png", "/assets/i.png"];
+  const slides = [
+    "/assets/banner-1.png",
+    "/assets/banner-2.png",
+    "/assets/banner-3.png",
+  ];
 
   // Redirect if logged in
   useEffect(() => {

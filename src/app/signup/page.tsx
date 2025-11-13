@@ -44,7 +44,11 @@ function SignUpForm() {
 
   // Background slideshow
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = ["/assets/image.png", "/assets/imae.png", "/assets/i.png"];
+  const slides = [
+    "/assets/banner-1.png",
+    "/assets/banner-2.png",
+    "/assets/banner-3.png",
+  ];
 
   // Auto slideshow
   useEffect(() => {
