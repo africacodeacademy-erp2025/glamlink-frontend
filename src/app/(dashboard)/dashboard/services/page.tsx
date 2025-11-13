@@ -323,7 +323,7 @@ export default function ServicesPage() {
       {/* Bottom Toast for Success/Error */}
       {(message || error) && (
         <div
-          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+          className={`fixed bottom-6 left-6 right-6 md:right-6 md:left-auto md:transform-none transform -translate-x-1/2 md:translate-x-0 max-w-md mx-auto md:mx-0 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
         >
           {error || message}
         </div>
@@ -446,14 +446,17 @@ export default function ServicesPage() {
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <label
                 className="font-medium text-sm text-gray-700"
                 htmlFor="your-services-category-filter"
               >
                 Filter by category
               </label>
-              <div id="your-services-category-filter" className="w-56">
+              <div
+                id="your-services-category-filter"
+                className="w-full md:w-56"
+              >
                 <Select
                   value={selectedCategory}
                   onValueChange={(v: string) => setSelectedCategory(v)}
@@ -473,61 +476,115 @@ export default function ServicesPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="w-[120px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {services
-                  .filter((service) =>
-                    selectedCategory === "All" || !selectedCategory
-                      ? true
-                      : ((service as any).category || "Uncategorized") ===
-                        selectedCategory
-                  )
-                  .map((service) => (
-                    <TableRow key={service.id}>
-                      <TableCell className="font-medium">
+          <div className="rounded-md border overflow-x-auto">
+            {/* Desktop/table view */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="w-[120px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services
+                    .filter((service) =>
+                      selectedCategory === "All" || !selectedCategory
+                        ? true
+                        : ((service as any).category || "Uncategorized") ===
+                          selectedCategory
+                    )
+                    .map((service) => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">
+                          {getServiceName(service)}
+                        </TableCell>
+                        <TableCell>{service.description || ""}</TableCell>
+                        <TableCell>
+                          {(service as any).category || "Uncategorized"}
+                        </TableCell>
+                        <TableCell>P{getServicePrice(service)}</TableCell>
+                        <TableCell className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditService(service)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteService(service)}
+                            className="text-red-600 border-red-300"
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+              {services.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No services added yet.
+                </div>
+              )}
+            </div>
+
+            {/* Mobile/stacked view */}
+            <div className="md:hidden space-y-4">
+              {services.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No services added yet.
+                </div>
+              )}
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-md border p-4 flex flex-col"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">
                         {getServiceName(service)}
-                      </TableCell>
-                      <TableCell>{service.description || ""}</TableCell>
-                      <TableCell>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {service.description || ""}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
                         {(service as any).category || "Uncategorized"}
-                      </TableCell>
-                      <TableCell>P{getServicePrice(service)}</TableCell>
-                      <TableCell className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditService(service)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteService(service)}
-                          className="text-red-600 border-red-300"
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-            {services.length === 0 && !isLoading && (
-              <div className="text-center py-8 text-muted-foreground">
-                No services added yet.
-              </div>
-            )}
+                      </div>
+                    </div>
+                    <div className="text-right ml-2">
+                      <div className="text-sm font-semibold">
+                        P{getServicePrice(service)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditService(service)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteService(service)}
+                      className="text-red-600 border-red-300"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
