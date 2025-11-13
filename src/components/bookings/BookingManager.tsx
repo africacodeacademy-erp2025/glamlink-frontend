@@ -26,9 +26,9 @@ import { useAuth } from "@/context/AuthContext";
 import BookingCalendar from "./BookingCalendar";
 import BookingList from "./BookingList";
 
-import { updateSlotBookedStatus } from "@/lib/api/timeslots";
 import UpcomingBookings from "./UpcomingBookings";
 import { useQueryClient } from "@tanstack/react-query";
+import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
 
 export default function BookingManager() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -262,14 +262,7 @@ export default function BookingManager() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white">
-          <div>
-            <h1 className="text-lg font-bold">Booking Management</h1>
-
-            <p className="text-gray-200">Manage and schedule client bookings</p>
-          </div>
-        </div>
+        <WelcomeBanner userName={user?.name} />
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

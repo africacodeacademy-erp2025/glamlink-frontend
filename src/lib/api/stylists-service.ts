@@ -192,8 +192,8 @@ export const updateStylistServiceWithName = async (
     serviceName?: string;
     price?: number;
     duration?: number;
-    category?: string;      // add this
-    description?: string;   // add this
+    category?: string; // add this
+    description?: string; // add this
   }
 ) => {
   try {
@@ -203,9 +203,9 @@ export const updateStylistServiceWithName = async (
         name: data.serviceName,
         category: data.category,
         description: data.description,
-        price: data.price
+        price: data.price,
       };
-      console.log('[DEBUG] Updating service:', serviceId, updatePayload);
+      console.log("[DEBUG] Updating service:", serviceId, updatePayload);
       await apiClient.put(`/services/${serviceId}`, updatePayload);
     }
 

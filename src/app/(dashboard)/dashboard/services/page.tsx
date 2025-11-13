@@ -38,6 +38,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
 
 export default function ServicesPage() {
   const [editDescription, setEditDescription] = useState("");
@@ -76,14 +77,6 @@ export default function ServicesPage() {
       ? true
       : ((s as any).category || "Uncategorized") === selectedCategory
   );
-
-  // Greeting logic
-  const greeting = (() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning,";
-    if (hour < 18) return "Good afternoon,";
-    return "Good evening,";
-  })();
 
   // Helper to clear current list
   const clearAllServices = () => {
@@ -328,13 +321,7 @@ export default function ServicesPage() {
           {error || message}
         </div>
       )}
-      {/* Greeting */}
-      <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white">
-        <h2 className="text-lg font-bold">
-          {greeting} {user?.name || "User"}, Welcome to GlamLink!
-        </h2>
-        <p>View your services and their prices below.</p>
-      </div>
+      <WelcomeBanner userName={user?.name} />
 
       {/* Add Service Button */}
       <div className="flex flex-col items-start mb-8">

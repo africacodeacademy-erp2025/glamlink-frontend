@@ -12,6 +12,7 @@ import {
   updateStylistBookingFee,
 } from "@/lib/api/bookingFee";
 import { useAuth } from "@/context/AuthContext";
+import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
 
 export default function PaymentMethodPage() {
   const { user } = useAuth();
@@ -188,14 +189,7 @@ export default function PaymentMethodPage() {
           {feeError || error || success || paymentSuccess}
         </div>
       )}
-      <div className="bg-pink-500 text-white p-10 rounded-2xl shadow mb-6 text-center w-full">
-        <p className="mt-2 text-lg">
-          {user?.name ? <>Welcome back, {user.name} 👋</> : <span>&nbsp;</span>}
-        </p>
-        <p className="mt-3 text-sm opacity-90">
-          Manage your payments method and booking fee
-        </p>
-      </div>
+      <WelcomeBanner userName={user?.name} />
 
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded shadow p-4 mb-6">
