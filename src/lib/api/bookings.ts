@@ -3,6 +3,7 @@
  * Handles all booking-related operations
  */
 
+import axios from "axios";
 import apiClient from "./client";
 import { getServiceById, fetchServiceNames } from "./stylists-service";
 import { getSlotById, fetchSlotTimes } from "./timeslots";
@@ -55,13 +56,39 @@ export const createBooking = async (data: CreateBookingData) => {
 };
 
 export const getBookingsByProvider = async (providerId: string) => {
-  const res = await apiClient.get(`/bookings/provider/${providerId}`);
-  return res.data;
+  if (!providerId) {
+    return [];
+  }
+  try {
+    const res = await apiClient.get(`/bookings/provider/${providerId}`);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      console.warn(
+        `[Bookings] No bookings found for provider ${providerId}. Returning empty list.`
+      );
+      return [];
+    }
+    throw error;
+  }
 };
 
 export const getBookingsByStylist = async (stylistId: string) => {
-  const res = await apiClient.get(`/bookings/provider/${stylistId}`);
-  return res.data;
+  if (!stylistId) {
+    return [];
+  }
+  try {
+    const res = await apiClient.get(`/bookings/provider/${stylistId}`);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      console.warn(
+        `[Bookings] No bookings found for stylist ${stylistId}. Returning empty list.`
+      );
+      return [];
+    }
+    throw error;
+  }
 };
 
 export const getBookingById = async (id: string) => {
