@@ -45,18 +45,21 @@ export const updateTimeSlot = async (
   slotId: string,
   updateData: Partial<CreateSlotData>
 ): Promise<Slot> => {
-  if (!slotId || typeof slotId !== 'string' || slotId.trim() === '') {
-    throw new Error('Invalid or missing timeslot id.');
+  if (!slotId || typeof slotId !== "string" || slotId.trim() === "") {
+    throw new Error("Invalid or missing timeslot id.");
   }
   try {
-  const res = await apiClient.patch(`/timeslots/${slotId.trim()}`, updateData);
+    const res = await apiClient.patch(
+      `/timeslots/${slotId.trim()}`,
+      updateData
+    );
     return res.data;
   } catch (error: any) {
     const errorMsg =
       error?.response?.data?.message ||
       error?.message ||
       error?.toString() ||
-      'Failed to update time slot';
+      "Failed to update time slot";
     throw new Error(errorMsg);
   }
 };
@@ -207,14 +210,14 @@ export const deleteTimeSlot = async (
   slotId: string,
   notify?: (msg: string, type?: "success" | "error") => void
 ): Promise<void> => {
-  if (!slotId || typeof slotId !== 'string' || slotId.trim() === '') {
-    const msg = 'Invalid or missing timeslot id.';
+  if (!slotId || typeof slotId !== "string" || slotId.trim() === "") {
+    const msg = "Invalid or missing timeslot id.";
     if (notify) notify(msg, "error");
     throw new Error(msg);
   }
   try {
     await apiClient.delete(`/timeslots/${slotId.trim()}`);
-    if (notify) notify('Timeslot deleted successfully', "success");
+    if (notify) notify("Timeslot deleted successfully", "success");
   } catch (error: any) {
     // Try to extract a meaningful message
     const errorMsg =
