@@ -18,6 +18,7 @@ import {
   Star,
   Heart,
 } from "lucide-react";
+import GlamlinkTour from "@/components/ui/ruixen-tour";
 
 export default function DashboardPage() {
   const [providerName, setProviderName] = useState<string>("");
@@ -25,6 +26,8 @@ export default function DashboardPage() {
   const [slotTimes, setSlotTimes] = useState<Record<string, string>>({});
   const [mappedBookings, setMappedBookings] = useState<any[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showTour, setShowTour] = useState(false);
+  const [tourStorageKey, setTourStorageKey] = useState<string | null>(null);
 
   const slides = [
     "/assets/banner-1.png",
@@ -54,6 +57,21 @@ export default function DashboardPage() {
     setIsClient(true);
     const user = getCurrentUser();
     setProviderName(user?.name || "Service Provider");
+
+    if (typeof window !== "undefined") {
+      const inferredId =
+        user?.id?.toString() ||
+        user?.userId?.toString() ||
+        user?.user_id?.toString() ||
+        "guest";
+      const storageKey = `glamlink:dashboard-tour:${inferredId}`;
+      setTourStorageKey(storageKey);
+
+      const hasSeenTour = window.localStorage.getItem(storageKey);
+      if (!hasSeenTour) {
+        setShowTour(true);
+      }
+    }
   }, []);
 
   // Data fetching
@@ -182,8 +200,16 @@ export default function DashboardPage() {
     return bookingDate < todayDate;
   });
 
+  const handleTourOpenChange = (open: boolean) => {
+    setShowTour(open);
+    if (!open && tourStorageKey && typeof window !== "undefined") {
+      window.localStorage.setItem(tourStorageKey, "true");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-50 pb-20 p-4 font-[Poppins]">
+      <GlamlinkTour open={showTour} onOpenChange={handleTourOpenChange} />
       {/* SLIDESHOW */}
       <div className="relative h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow mb-6">
         <Image

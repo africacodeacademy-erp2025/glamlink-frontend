@@ -1,7 +1,7 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
+"use client";
+import { useState, useEffect } from "react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,8 +11,8 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleLinkClick = () => setIsOpen(false);
@@ -24,8 +24,8 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
       className={`fixed top-0 w-full z-50 backdrop-blur-md transition-all duration-500 ${
         isScrolled
-          ? 'bg-gradient-to-r from-pink-600/90 via-purple-600/90 to-pink-500/90 shadow-lg'
-          : 'bg-pink-500/80'
+          ? "bg-gradient-to-r from-pink-600/90 via-purple-600/90 to-pink-500/90 shadow-lg"
+          : "bg-pink-500/80"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -48,13 +48,17 @@ export default function Navbar() {
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center p-2 text-white rounded-lg lg:hidden hover:bg-pink-600/40 focus:outline-none focus:ring-2 focus:ring-white transition-all"
             >
-              {isOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
+              {isOpen ? (
+                <XMarkIcon className="w-7 h-7" />
+              ) : (
+                <Bars3Icon className="w-7 h-7" />
+              )}
             </button>
           </div>
 
           {/* Nav Links */}
           <div
-            className={`${isOpen ? 'block' : 'hidden'} w-full lg:flex lg:items-center lg:pl-12 max-lg:py-4`}
+            className={`${isOpen ? "block" : "hidden"} w-full lg:flex lg:items-center lg:pl-12 max-lg:py-4`}
           >
             <ul className="flex flex-col lg:flex-row max-lg:gap-4 mt-4 lg:mt-0 lg:space-x-8">
               {[
