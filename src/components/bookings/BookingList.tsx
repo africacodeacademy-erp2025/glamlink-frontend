@@ -219,122 +219,203 @@ export default function BookingList(props: BookingListProps) {
           </div>
         </div>
 
-        {/* Table */}
+        {/* Table (desktop) and stacked cards (mobile) */}
         <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-medium">
-                    {booking.customerName || booking.client_name || "Client"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">
-                      {/* Show date and time only once, formatted as 'YYYY-MM-DD HH:mm' */}
-                      {(() => {
-                        const slotDateStr =
-                          getStartTime(booking) ||
-                          booking.bookedAt ||
-                          booking.createdAt ||
-                          booking.updatedAt;
-                        if (slotDateStr) {
-                          const date = new Date(slotDateStr);
-                          if (!isNaN(date.getTime())) {
-                            return (
-                              date.toLocaleString("en-US", {
-                                timeZone: "UTC",
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true,
-                              }) + " UTC"
-                            );
-                          }
-                        }
-                        return (
-                          <span className="italic text-gray-400">
-                            Loading date...
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getServiceName(booking) !== "Unknown Service" ? (
-                      getServiceName(booking)
-                    ) : (
-                      <span className="italic text-gray-400">
-                        Loading service...
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onConfirm(booking.id)}
-                        disabled={
-                          booking.status === BookingStatus.CONFIRMED ||
-                          booking.status === BookingStatus.COMPLETED ||
-                          booking.status === BookingStatus.RESCHEDULED
-                        }
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onReschedule(booking)}
-                        disabled={
-                          booking.status === BookingStatus.COMPLETED ||
-                          booking.status === BookingStatus.RESCHEDULED
-                        }
-                      >
-                        Reschedule
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onCancel(booking.id)}
-                        disabled={
-                          booking.status === BookingStatus.COMPLETED ||
-                          booking.status === BookingStatus.CANCELLED
-                        }
-                        className="text-destructive"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onComplete(booking.id)}
-                        disabled={
-                          booking.status === BookingStatus.COMPLETED ||
-                          (booking.status !== BookingStatus.CONFIRMED &&
-                            booking.status !== BookingStatus.RESCHEDULED)
-                        }
-                      >
-                        Complete
-                      </Button>
-                    </div>
-                  </TableCell>
+          {/* Desktop/table view */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table className="min-w-[780px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-[80px]">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredBookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-medium">
+                      {booking.customerName || booking.client_name || "Client"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">
+                        {/* Show date and time only once, formatted as 'YYYY-MM-DD HH:mm' */}
+                        {(() => {
+                          const slotDateStr =
+                            getStartTime(booking) ||
+                            booking.bookedAt ||
+                            booking.createdAt ||
+                            booking.updatedAt;
+                          if (slotDateStr) {
+                            const date = new Date(slotDateStr);
+                            if (!isNaN(date.getTime())) {
+                              return (
+                                date.toLocaleString("en-US", {
+                                  timeZone: "UTC",
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                }) + " UTC"
+                              );
+                            }
+                          }
+                          return (
+                            <span className="italic text-gray-400">
+                              Loading date...
+                            </span>
+                          );
+                        })()}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getServiceName(booking) !== "Unknown Service" ? (
+                        getServiceName(booking)
+                      ) : (
+                        <span className="italic text-gray-400">
+                          Loading service...
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onConfirm(booking.id)}
+                          disabled={
+                            booking.status === BookingStatus.CONFIRMED ||
+                            booking.status === BookingStatus.COMPLETED ||
+                            booking.status === BookingStatus.RESCHEDULED
+                          }
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onReschedule(booking)}
+                          disabled={
+                            booking.status === BookingStatus.COMPLETED ||
+                            booking.status === BookingStatus.RESCHEDULED
+                          }
+                        >
+                          Reschedule
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onCancel(booking.id)}
+                          disabled={
+                            booking.status === BookingStatus.COMPLETED ||
+                            booking.status === BookingStatus.CANCELLED
+                          }
+                          className="text-destructive"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onComplete(booking.id)}
+                          disabled={
+                            booking.status === BookingStatus.COMPLETED ||
+                            (booking.status !== BookingStatus.CONFIRMED &&
+                              booking.status !== BookingStatus.RESCHEDULED)
+                          }
+                        >
+                          Complete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile stacked view */}
+          <div className="md:hidden space-y-4 p-2">
+            {filteredBookings.map((booking) => (
+              <div
+                key={booking.id}
+                className="bg-white rounded-md border p-4 flex flex-col"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">
+                      {booking.customerName || booking.client_name || "Client"}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {formatStartTime(booking) || "Loading date..."}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {getServiceName(booking)}
+                    </div>
+                    <div className="mt-2">{getStatusBadge(booking.status)}</div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => onConfirm(booking.id)}
+                    disabled={
+                      booking.status === BookingStatus.CONFIRMED ||
+                      booking.status === BookingStatus.COMPLETED ||
+                      booking.status === BookingStatus.RESCHEDULED
+                    }
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => onReschedule(booking)}
+                    disabled={
+                      booking.status === BookingStatus.COMPLETED ||
+                      booking.status === BookingStatus.RESCHEDULED
+                    }
+                  >
+                    Reschedule
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto text-destructive"
+                    onClick={() => onCancel(booking.id)}
+                    disabled={
+                      booking.status === BookingStatus.COMPLETED ||
+                      booking.status === BookingStatus.CANCELLED
+                    }
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => onComplete(booking.id)}
+                    disabled={
+                      booking.status === BookingStatus.COMPLETED ||
+                      (booking.status !== BookingStatus.CONFIRMED &&
+                        booking.status !== BookingStatus.RESCHEDULED)
+                    }
+                  >
+                    Complete
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {filteredBookings.length === 0 && (

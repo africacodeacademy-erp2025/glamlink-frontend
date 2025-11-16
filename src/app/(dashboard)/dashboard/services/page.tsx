@@ -38,6 +38,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
 
 export default function ServicesPage() {
   const [editDescription, setEditDescription] = useState("");
@@ -76,14 +77,6 @@ export default function ServicesPage() {
       ? true
       : ((s as any).category || "Uncategorized") === selectedCategory
   );
-
-  // Greeting logic
-  const greeting = (() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning,";
-    if (hour < 18) return "Good afternoon,";
-    return "Good evening,";
-  })();
 
   // Helper to clear current list
   const clearAllServices = () => {
@@ -323,18 +316,12 @@ export default function ServicesPage() {
       {/* Bottom Toast for Success/Error */}
       {(message || error) && (
         <div
-          className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+          className={`fixed bottom-6 left-6 right-6 md:right-6 md:left-auto md:transform-none transform -translate-x-1/2 md:translate-x-0 max-w-md mx-auto md:mx-0 px-6 py-3 rounded-xl shadow-lg animate-fade-in-out z-50 ${error ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
         >
           {error || message}
         </div>
       )}
-      {/* Greeting */}
-      <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white">
-        <h2 className="text-lg font-bold">
-          {greeting} {user?.name || "User"}, Welcome to GlamLink!
-        </h2>
-        <p>View your services and their prices below.</p>
-      </div>
+      <WelcomeBanner userName={user?.name} />
 
       {/* Add Service Button */}
       <div className="flex flex-col items-start mb-8">
@@ -346,7 +333,7 @@ export default function ServicesPage() {
         </button>
 
         {showAddModal && (
-          <div className="max-w-md bg-white rounded-lg shadow p-6">
+          <div className="w-full bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4 text-pink-600">
               Add Service
             </h2>
@@ -400,7 +387,8 @@ export default function ServicesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Description
+                  Description{" "}
+                  <span className="text-xs text-gray-500">(optional)</span>
                 </label>
                 <textarea
                   className="w-full border p-2 rounded"
@@ -445,14 +433,17 @@ export default function ServicesPage() {
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <label
                 className="font-medium text-sm text-gray-700"
                 htmlFor="your-services-category-filter"
               >
                 Filter by category
               </label>
-              <div id="your-services-category-filter" className="w-56">
+              <div
+                id="your-services-category-filter"
+                className="w-full md:w-56"
+              >
                 <Select
                   value={selectedCategory}
                   onValueChange={(v: string) => setSelectedCategory(v)}
@@ -472,61 +463,115 @@ export default function ServicesPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="w-[120px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {services
-                  .filter((service) =>
-                    selectedCategory === "All" || !selectedCategory
-                      ? true
-                      : ((service as any).category || "Uncategorized") ===
-                        selectedCategory
-                  )
-                  .map((service) => (
-                    <TableRow key={service.id}>
-                      <TableCell className="font-medium">
+          <div className="rounded-md border overflow-x-auto">
+            {/* Desktop/table view */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="w-[120px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services
+                    .filter((service) =>
+                      selectedCategory === "All" || !selectedCategory
+                        ? true
+                        : ((service as any).category || "Uncategorized") ===
+                          selectedCategory
+                    )
+                    .map((service) => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">
+                          {getServiceName(service)}
+                        </TableCell>
+                        <TableCell>{service.description || ""}</TableCell>
+                        <TableCell>
+                          {(service as any).category || "Uncategorized"}
+                        </TableCell>
+                        <TableCell>P{getServicePrice(service)}</TableCell>
+                        <TableCell className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditService(service)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteService(service)}
+                            className="text-red-600 border-red-300"
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+              {services.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No services added yet.
+                </div>
+              )}
+            </div>
+
+            {/* Mobile/stacked view */}
+            <div className="md:hidden space-y-4">
+              {services.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No services added yet.
+                </div>
+              )}
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-md border p-4 flex flex-col"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">
                         {getServiceName(service)}
-                      </TableCell>
-                      <TableCell>{service.description || ""}</TableCell>
-                      <TableCell>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {service.description || ""}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
                         {(service as any).category || "Uncategorized"}
-                      </TableCell>
-                      <TableCell>P{getServicePrice(service)}</TableCell>
-                      <TableCell className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditService(service)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteService(service)}
-                          className="text-red-600 border-red-300"
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-            {services.length === 0 && !isLoading && (
-              <div className="text-center py-8 text-muted-foreground">
-                No services added yet.
-              </div>
-            )}
+                      </div>
+                    </div>
+                    <div className="text-right ml-2">
+                      <div className="text-sm font-semibold">
+                        P{getServicePrice(service)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditService(service)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteService(service)}
+                      className="text-red-600 border-red-300"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -586,7 +631,8 @@ export default function ServicesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Description
+                  Description{" "}
+                  <span className="text-xs text-gray-500">(optional)</span>
                 </label>
                 <textarea
                   className="w-full border p-2 rounded"

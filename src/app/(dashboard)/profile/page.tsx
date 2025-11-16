@@ -7,11 +7,11 @@ import {
   UserProfile,
 } from "@/lib/api/profile";
 import { useAuth } from "@/context/AuthContext";
+import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
 
 export default function Profile() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const [greeting, setGreeting] = useState("");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,14 +28,6 @@ export default function Profile() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [subscriptionPlan, setSubscriptionPlan] = useState("");
-
-  // Set greeting
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Good morning!");
-    else if (hour < 18) setGreeting("Good afternoon!");
-    else setGreeting("Good evening!");
-  }, []);
 
   // Detect user country
   useEffect(() => {
@@ -121,6 +113,7 @@ export default function Profile() {
         phoneNumber,
         location,
         paymentMethods,
+        subscriptionPlan,
       };
       await updateUserProfileById(user.id, updatedProfile);
       setMessage("Profile updated successfully!");
@@ -150,13 +143,10 @@ export default function Profile() {
 
   return (
     <div className="pb-16 p-4 bg-gray-50 min-h-screen">
-      {/* Greeting */}
-      <div className="mb-6 p-6 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow text-white text-center">
-        <h2 className="text-2xl font-bold">
-          {greeting} {name || "User"}!
-        </h2>
-        <p className="mt-2 text-sm">Update your profile information below.</p>
-      </div>
+      <WelcomeBanner
+        userName={name || user?.name}
+        subtitle="Update your profile information below."
+      />
 
       {/* Error Message */}
       {error && (

@@ -27,7 +27,11 @@ const items = [
   { title: "Services", url: "/dashboard/services", icon: Search },
   { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "Bookings", url: "/dashboard/booking", icon: Inbox },
-  { title: "Payment Method", url: "/dashboard/payment-method", icon: CreditCard },
+  {
+    title: "Payment Method",
+    url: "/dashboard/payment-method",
+    icon: CreditCard,
+  },
   { title: "Profile", url: "/profile", icon: User },
   { title: "Logout", url: "/logout", icon: LogOut },
 ];
@@ -38,7 +42,6 @@ export function AppSidebar({ bookingsCount }: { bookingsCount?: number }) {
   return (
     <Sidebar className="bg-gradient-to-b from-pink-50 via-white to-pink-100 border-r border-pink-200 shadow-md">
       <SidebarContent>
-
         {/* Brand Header */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-pink-100">
           <img
