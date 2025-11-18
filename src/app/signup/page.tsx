@@ -141,10 +141,32 @@ function SignUpForm() {
       </div>
 
       <div className="relative z-10 w-full max-w-5xl px-4 py-10">
-        {!selectedPlan && <SubscriptionPlans />}
+        {!selectedPlan && (
+          <div className="w-full max-w-5xl mx-auto">
+            <div className="self-start mb-3">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="text-sm bg-pink-600 text-white px-3 py-1 rounded flex items-center gap-2 hover:bg-pink-700"
+              >
+                Back
+              </button>
+            </div>
+            <SubscriptionPlans />
+          </div>
+        )}
 
         {selectedPlan && (
           <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 mt-10 flex flex-col items-center w-full max-w-md mx-auto transition-transform hover:scale-[1.02] duration-300">
+            <div className="self-start mb-3">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="text-sm bg-pink-600 text-white px-3 py-1 rounded flex items-center gap-2 hover:bg-pink-700"
+              >
+                Back
+              </button>
+            </div>
             <div className="mb-6 p-4 bg-pink-500 rounded shadow text-white w-full text-center">
               <h2 className="text-lg font-bold">{greeting}</h2>
               <p className="text-pink-200">Join GlamLink today!</p>

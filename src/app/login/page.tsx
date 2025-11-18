@@ -97,6 +97,15 @@ export default function LoginPage() {
 
       {/* 💫 Login Card */}
       <div className="relative z-10 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md flex flex-col items-center transition-transform hover:scale-[1.02] duration-300 border border-white/30">
+        <div className="self-start mb-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-sm bg-pink-600 text-white px-3 py-1 rounded flex items-center gap-2 hover:bg-pink-700"
+          >
+            Back
+          </button>
+        </div>
         {/* Greeting */}
         <div className="mb-6 p-5 bg-pink-500 rounded-xl shadow text-white w-full text-center">
           <h2 className="text-xl font-bold">{greeting}</h2>
