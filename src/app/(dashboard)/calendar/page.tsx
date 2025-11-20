@@ -21,8 +21,17 @@ import {
 } from "@/lib/api/timeslots";
 import { useAuth } from "@/context/AuthContext";
 import { getCurrentStylistId } from "@/lib/api/auth";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function Page() {
+  return (
+    <ProtectedRoute>
+      <CalendarContent />
+    </ProtectedRoute>
+  );
+}
+
+function CalendarContent() {
   const isMobile = useIsMobile();
   const { user, isAuthenticated, loading } = useAuth();
   const [events, setEvents] = useState<EventInput[]>([]);

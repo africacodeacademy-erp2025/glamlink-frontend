@@ -8,8 +8,17 @@ import {
 } from "@/lib/api/profile";
 import { useAuth } from "@/context/AuthContext";
 import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function Profile() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
+  );
+}
+
+function ProfileContent() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -46,9 +55,10 @@ export default function Profile() {
   // Fetch profile
   useEffect(() => {
     if (user?.id) fetchProfile();
+    // console.log(user?.id)
     else {
       setLoading(false);
-      setError("Please log in to view your profile.");
+      setError(error);
     }
   }, [user]);
 
@@ -95,7 +105,7 @@ export default function Profile() {
         setMessage("Profile picture updated!");
         setTimeout(() => setMessage(""), 3000);
       } catch (err: any) {
-        setError(`Failed to upload profile picture`);
+        setError(`${error}, Failed to upload profile picture`);
         console.log(err.message);
       } finally {
         setUploading(false);

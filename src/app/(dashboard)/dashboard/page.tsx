@@ -19,8 +19,17 @@ import {
   Heart,
 } from "lucide-react";
 import GlamlinkTour from "@/components/ui/ruixen-tour";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
+
+function DashboardContent() {
   const [providerName, setProviderName] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [slotTimes, setSlotTimes] = useState<Record<string, string>>({});
