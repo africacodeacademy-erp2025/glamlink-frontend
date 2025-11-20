@@ -39,8 +39,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function ServicesPage() {
+  return (
+    <ProtectedRoute>
+      <ServicesContent />
+    </ProtectedRoute>
+  );
+}
+
+function ServicesContent() {
   const [editDescription, setEditDescription] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");

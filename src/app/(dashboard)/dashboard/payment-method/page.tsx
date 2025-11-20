@@ -13,8 +13,17 @@ import {
 } from "@/lib/api/bookingFee";
 import { useAuth } from "@/context/AuthContext";
 import { WelcomeBanner } from "@/components/dashboards/welcome-banner";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function PaymentMethodPage() {
+  return (
+    <ProtectedRoute>
+      <PaymentMethodContent />
+    </ProtectedRoute>
+  );
+}
+
+function PaymentMethodContent() {
   const { user } = useAuth();
   const [paymentName, setMethodName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
